@@ -1,0 +1,213 @@
+@charset "utf-8";
+body{font-family:Arial,Helvetica,sans-serif;line-height:1.5;font-size:14px;margin:0;padding:0;background:url(../images/body-bg.jpg)}
+.mainwrap{margin:10px auto;width:80%}
+.tabs-menu{clear:both; height: 16px;
+    margin-left: -19px;}
+.tabs-menu li{height:30px;line-height:30px;float:left;margin-right:10px;list-style:none;background-color:#ccc;border-top:1px solid #d4d4d1;border-right:1px solid #d4d4d1;border-left:1px solid #d4d4d1}
+.tabs-menu li.current{position:relative;background-color:#fff;border-bottom:1px solid #fff;z-index:5}
+.tabs-menu li a{padding:10px;text-transform:uppercase;color:#fff;text-decoration:none}
+.tabs-menu .current a{color:#2e7da3}
+.tab{border:1px solid #d4d4d1;background-color:#fff;margin-bottom:20px;width:auto}
+.tab-content{width:100%;padding:1% 1% 2%;display:none}
+#tab-1{display:block}
+*{-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box}
+form header h2{color:#666;font-weight:400;font-family:Geneva,Arial,Helvetica,sans-serif}
+form header{margin:0 0 6px}
+form header div{font-size:90%;color:#999}
+form header h2{margin:0 0 5px}
+form > div{clear:both;overflow:hidden;padding:1px;margin:0 0 10px}
+form > div > fieldset > div > div{margin:0 0 5px}
+form > div > label,legend{width:25%;float:left;padding-right:10px}
+.redper{width:12.1%}
+.left86{width:87%;float:left}
+.searchbox{width:40%!important;text-indent:5px}
+form > div > div,form > div > fieldset > div{width:75%;float:right}
+form > div > fieldset label{font-size:90%}
+fieldset{border:0;padding:0}
+input[type=text],input[type=email],input[type=url],input[type=password],textarea{width:100%;border-top:1px solid #ccc;border-left:1px solid #ccc;border-right:1px solid #ccc;border-bottom:1px solid #ccc}
+input[type=text],input[type=email],input[type=url],input[type=password]{width:100%;height:25px;text-indent:5px}
+input[type=text]:focus,input[type=email]:focus,input[type=url]:focus,input[type=password]:focus,textarea:focus{outline:0;border-color:#4697e4}
+.leftform{width:49%;float:left;
+    margin-top: 15px;}
+.select{height:25px}
+.cursour{cursor:pointer}
+table.imagetable{font-size:13px;color:#333;border-width:1px;border-color:#999;border-collapse:collapse;margin-top:2%}
+table.imagetable th{background:#BBB;border-width:1px;padding:8px;border-style:solid;border-color:#999}
+table.imagetable td{background:#F4F4F4;border-width:1px;padding:8px;border-style:solid;border-color:#CDCDCD}
+.btnright{float:right;margin-top:10px;margin-bottom:10px}
+.btnright input{cursor:pointer;padding:3px}
+.main-header{}
+.left-widthr{float:left;width:50%}
+.left-widthl{float:right;width:447px}
+.left-widthl select{width:50%}
+.gray{background:#E4E4E4;padding:8px 0}
+#saveForm{background:#3498db;background-image:-webkit-linear-gradient(top,#3498db,#2980b9);background-image:-moz-linear-gradient(top,#3498db,#2980b9);background-image:-ms-linear-gradient(top,#3498db,#2980b9);background-image:-o-linear-gradient(top,#3498db,#2980b9);background-image:linear-gradient(to bottom,#3498db,#2980b9);color:#fff;font-size:13px;border:none;padding:5px 20px;text-decoration:none; cursor:pointer;}
+#saveForm:hover{background:#3cb0fd;background-image:-webkit-linear-gradient(top,#3cb0fd,#3498db);background-image:-moz-linear-gradient(top,#3cb0fd,#3498db);background-image:-ms-linear-gradient(top,#3cb0fd,#3498db);background-image:-o-linear-gradient(top,#3cb0fd,#3498db);background-image:linear-gradient(to bottom,#3cb0fd,#3498db);text-decoration:none}
+.left-widthr b{font-size:18px;color:#09C;font-style:normal;font-weight:400}
+.tablesorter td a { color:#000; text-decoration:none; font-size:14px;  }
+.tablesorter td a:hover { color:#F60;  }
+/* Expandable */
+.expandable { 
+    vertical-align: top; 
+    height:auto !important; 
+}
+.list {
+    display:none; 
+    height:auto;
+    margin:0;
+    float: left;
+}
+.show {
+    display: none; 
+}
+.hide:target + .show {
+    display: inline;     font-size: 20px;
+    margin-top: -6px; 
+}
+.hide:target {
+    display: none; 
+}
+.hide:target ~ .list {
+    display:inline; 
+}
+
+/*style the (+) and (-) */
+.hide, .show {
+	
+	
+	font-size: 20px;
+	color: #fff;
+	text-shadow: 0 1px 0 #666;
+	text-align: center;
+	text-decoration: none;
+	opacity: .95;
+	margin-right: 0;
+	float: left;
+	
+}
+
+.hide:hover, .show:hover {
+	color: #eee;
+	text-shadow: 0 0 1px #666;
+	text-decoration: none;
+	opacity: 1;
+	
+}
+
+.list p{
+    height:auto;
+    margin:0;
+}
+.question {
+	float: left;
+	height: auto;
+	width: 90%;
+	line-height: 20px;
+	padding-left: 10px; 
+	margin-bottom: 5px; font-weight:bold;
+}
+
+
+
+
+
+
+
+    select {
+        width: 350px;
+        float: left; 
+    margin-top: 37px;
+    }
+    .controls {
+        width: 40px;
+        float: left;
+        margin: 10px;     margin-top: 68px;
+    }
+    .controls a {
+           background-color: #2E8BC8;
+    border-radius: 4px;
+    border: 2px solid #79BAE6;
+    color: #ffffff;
+    padding: 2px;
+    font-size: 14px;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+    margin: 8px;
+    width: 25px;
+    }
+    
+.subsec h2 { font-size:18px; font-weight:normal; padding-top:10px; }
+.fty { width:150px; float:left; position:absolute; margin-left: 410px;  }
+.fty2 { width:150px; float:left; position:absolute;   }
+.leftform input { float:left; margin-left:8px; width:180px; }
+.leftform label { float:left; width:120px; text-align:right; }
+.rht {     text-align: right;
+    margin-right: 117px; }
+	.din { display:none; }
+	.letbt {width:20px !important; margin-top:12px; }
+.selw select{  float: left;
+    margin-left: 8px;
+    width: 180px;     height: 25px; margin-top:0px; }
+	.forbtn { width: 228px;
+    float: left;}
+	input.subf { 
+    margin-bottom: 20px; margin-top:10px;
+   }
+   .welcome { text-align:right; }
+   .welcome span a { text-decoration:none; color:#3498db; }
+   .welcome span a:hover {color:#006699; }
+/* Exp and End */
+@media (max-width: 1138px) {
+.leftform {
+    width: auto;
+    float: left;
+    margin-top: 15px;
+}
+.din { display:block; }
+.rht {
+    text-align: left;
+    margin-right: 117px;
+}
+.rht input {     margin-top: 18px;
+    margin-left:0px; }
+	.leftform {
+    width: 100%;
+    float: left;
+    margin-top: 15px;
+}
+}
+@media (max-width: 850px) {
+select {
+    width: 44%;
+    float: left;
+    margin-top: 37px;
+}
+.controls {
+    width: 100%;
+    float: left;
+    margin: 0px;
+    margin-top: 0px; 
+}
+.mainwrap{margin:10px auto;width:98%}
+.leftform{float:left;margin-right:2%}
+}
+@media (max-width: 600px) {
+form > div{margin:0 0 15px}
+.leftform label {
+    float: left;
+    width: 120px;
+    text-align: left;
+}
+.leftform input {
+    float: left;
+    margin-left: 0px;
+    width: 100%;
+}
+form > div > label,legend{width:100%;float:none;margin:0 0 5px}
+form > div > div,form > div > fieldset > div{width:100%;float:none}
+input[type=text],input[type=email],input[type=url],input[type=password],textarea,select{width:100%}
+}
+@media (min-width: 1200px) {
+form > div > label,legend{text-align:right}
+}

@@ -1,0 +1,53 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<title>Attendance</title>
+ <script src="<?php echo base_url()?>js/jquery-1.11.1.min.js"></script>
+</head>
+<body>
+    <h4>Attendance</h4>
+	<div style="color:red;"><?php echo $msg;?></div>
+	<form name="frm" action="" method="post">
+    <select id="sbOne" multiple="multiple" name="present" style="width:150px;height:200px;">
+        <?php foreach($present_users->result() as $present) {?>
+		<option value="<?php echo $present->username?>"><?php echo $present->name?></option>
+        <?php }?>
+    </select>
+	
+   <input type="button" id="left" value="<" />
+    <input type="button" id="right" value=">" />
+	
+    <select id="sbTwo" multiple="multiple" name="absent[]" style="width:150px;height:200px;">
+        <?php foreach($absent_users->result() as $absent) {?>
+		<option value="<?php echo $absent->username?>" disabled="disabled"><?php echo $absent->name?></option>
+        <?php }?>
+    </select>
+	<input type="submit" value="Save" name="save" />
+    </form>
+    <br />
+ 
+    
+  
+<script type="text/javascript">
+$(function () { function moveItems(origin, dest) {
+    $(origin).find(':selected').appendTo(dest);
+}
+ 
+function moveAllItems(origin, dest) {
+    $(origin).children().appendTo(dest);
+}
+ 
+$('#left').click(function () {
+    moveItems('#sbTwo', '#sbOne');
+});
+ 
+$('#right').on('click', function () {
+    moveItems('#sbOne', '#sbTwo');
+});
+ 
+
+});
+</script>
+</body>
+</html>
