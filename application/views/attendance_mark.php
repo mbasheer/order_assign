@@ -71,6 +71,27 @@ $(".subf").click(function() {
      }
 return false;
 	});
+	
+	
+	//run rule now button action
+	$("#run_rule").click(function() {
+	   $.ajax({
+        url: "<?php echo base_url()?>index.php/cron/order_assign",
+        cache: false,
+		beforeSend: function() {
+		 var runningmsg ='Please Wait .....';
+		 $('#running').html(runningmsg);
+	      $('#running').show();
+		   $('#run_rule').hide();
+			},
+        success: function(){
+		                    $('#running').hide(); 
+							$('#run_rule').show();
+                       }
+           });
+	  
+	})
+	
  
 });
 
@@ -196,6 +217,7 @@ return false;
     </form>
 	<div id="inform" align="left" style="color:#993300; display:none;">New Rule Created Successfully</div>
 	<div id="flash" align="left"  ></div>
+	<div class="runrule" id="runrule"><a href="#" id="run_rule" title="Run Rule" alt="Run Rule">Run Rule Now</a></div><div class="runrule" id="running"></div>
     <table width="100%" border="0" class="imagetable" id="update" >
       <thead>
 	  <tr>

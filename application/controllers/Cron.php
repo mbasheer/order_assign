@@ -19,7 +19,7 @@ class Cron extends CI_Controller {
 		  $this->load->helper('basic');
     } 
 	//cron job for assign orders automatically
-	//it runs in every 15 minutes
+	//it runs in every 10 minutes
 	public function order_assign()
 	{
 		//check todays attendance is marked
@@ -43,8 +43,9 @@ class Cron extends CI_Controller {
 			 $order_price  = $order->total;
 			 //createduser_id = order ceated by staff or customer 
 			 $createduser  = $order->createduser_id;
+			 $cust_email   = $order->email;
 			 //get best users using assign rule
-			  $assign_user  = $this->order->orderAssignUser($site_id,$order_id,$order_price,$site_code, $createduser);
+			  $assign_user  = $this->order->orderAssignUser($site_id,$order_id, $cust_email, $order_price,$site_code, $createduser);
 			 //asign order to user if get assigned user
 			 if($assign_user)
 			 {

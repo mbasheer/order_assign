@@ -211,3 +211,8 @@ input[type=text],input[type=email],input[type=url],input[type=password],textarea
 @media (min-width: 1200px) {
 form > div > label,legend{text-align:right}
 }
+.runrule{float:right;padding:0 7px 10px 0;color: #e0162b;font-size: 14px;}
+.runrule a{color: #e0162b;
+    font-size: 14px;
+    text-decoration: none;}
+	.runrule a:hover{ text-decoration:underline;}
