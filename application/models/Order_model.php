@@ -31,7 +31,7 @@ class Order_model extends CI_Model {
 		//select only from one week time frame
 		
 		//this ithe correct sql, commented only for testing 
-		$sql  = "SELECT `order_id`,`date_added`, total FROM `order` 
+		$sql  = "SELECT `order_id`,`date_added`, total, createduser_id FROM `order` 
 		         WHERE (`customer_assign` = 0 or customer_assign IS NULL) AND (date_added > DATE_SUB(NOW(), INTERVAL 1 WEEK) or date_modified > DATE_SUB(NOW(), INTERVAL 1 WEEK)) 
 				 AND order_status_id not in(2,45)
 				 order by date_added";	
@@ -43,7 +43,7 @@ class Order_model extends CI_Model {
 	
 	//return assigned username
 	//input - site id , order id and price
-	public function orderAssignUser($site_id,$order_id,$order_price,$site_code)
+	public function orderAssignUser($site_id,$order_id,$order_price,$site_code,$createduser)
 	{
 	    $assigned_user = 0;
 		//if order is blank that order directly assigned to blank user with our any further checking
@@ -55,6 +55,16 @@ class Order_model extends CI_Model {
 		   
 		   return 'blank';
 		}
+		
+		//check this order created by our staff other than customer assign to that staff 
+		if($createduser != 0)
+		{
+		   //if any created user id
+		   //gt that username from user_id
+		   $username = $this->getUsernamefromId($createduser);
+		   if($username){return $username;}
+		}
+		
 		
 		//if this order is a re-order(copy) of another order , assigned to same user
 		//return parent order assigned user , if copied order
@@ -365,6 +375,19 @@ class Order_model extends CI_Model {
 	   }
 	   $row_assigned       = $sql_assigned->row();
 	   return $row_assigned->username;
+	}
+	
+	//return usernmae from user_id
+	function getUsernamefromId($createduser)
+	{
+	    $query_user  = "SELECT `username` FROM `user` WHERE `user_id`='$createduser'";
+		$sql_user    = $this->site_db->query($query_user);
+		if($sql_user->num_rows() < 1)
+		{
+		  return 0;
+		}
+		$row_user = $sql_user->row();
+		return $row_user->username;
 	}
 	
 	//function get all users

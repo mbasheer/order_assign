@@ -41,8 +41,10 @@ class Cron extends CI_Controller {
 		  {
 		     $order_id     = $order->order_id;
 			 $order_price  = $order->total;
+			 //createduser_id = order ceated by staff or customer 
+			 $createduser  = $order->createduser_id;
 			 //get best users using assign rule
-			  $assign_user  = $this->order->orderAssignUser($site_id,$order_id,$order_price,$site_code);
+			  $assign_user  = $this->order->orderAssignUser($site_id,$order_id,$order_price,$site_code, $createduser);
 			 //asign order to user if get assigned user
 			 if($assign_user)
 			 {
