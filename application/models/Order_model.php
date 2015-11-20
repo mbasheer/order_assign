@@ -463,4 +463,48 @@ class Order_model extends CI_Model {
 		 $row  = $sql->row();
 		 return $row->setting_value;
 	}
+	
+	
+	//return diff order with changed username
+	//first create a temporary table , values of all order assigned details from opasa db 
+	//then get all orders from website 
+	//compare both table and return all orders of mismatched assigned username 
+	public function getAllReAssignOrder($site_code,$site_id)
+	{
+	    $CI = &get_instance();
+		$this->site_db = $CI->load->database($site_code, TRUE);
+		//get order_ids
+		//avoid old orders
+		//select order only from one week time frame
+		$query_assigned_site = "select a.order_id,b.username from `order` a join user b on a.customer_assign = b.user_id 
+		                        where (a.date_added > DATE_SUB(NOW(), INTERVAL 7 DAY) or a.date_modified > DATE_SUB(NOW(), INTERVAL 7 Day))";
+		$sql_assigned_site   = $this->site_db->query($query_assigned_site); 
+		//add this result to array for comparison
+		$site_order_array = array(); 
+		foreach($sql_assigned_site->result() as $row_assigned_site)
+		{
+		  $user_name = $row_assigned_site->username;
+		  $order_id  = $row_assigned_site->order_id;
+		  $site_order_array[$order_id] = $user_name;
+		}
+		//get assigned order from opas table
+		$assigned_order_query = "select username, order_id from assign_orders where assign_date > DATE_SUB(NOW(), INTERVAL 7 DAY) and site_id = '$site_id'"	;
+		$assigned_order_sql   = $this->opasa->query($assigned_order_query); 
+		//add this result to array for comparison
+		$opas_order_array = array(); 
+		foreach($assigned_order_sql->result() as $assigned_order_row)
+		{
+		  $user_name = $assigned_order_row->username;
+		  $order_id  = $assigned_order_row->order_id;
+		  $opas_order_array[$order_id] = $user_name;
+		}
+		$diff_orders = array_diff_assoc($site_order_array, $opas_order_array)	;
+		return $diff_orders;  
+	}
+	
+	public function changeReorderUser($order_id, $user_name, $site_id)
+	{
+	    $sql = "update assign_orders set username = '$user_name' where site_id = '$site_id' and order_id = '$order_id'";
+		$this->opasa->query($sql);
+	}
 }

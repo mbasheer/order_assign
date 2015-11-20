@@ -77,6 +77,25 @@ class Cron extends CI_Controller {
            $this->email->send();
 		}
 	}
+	
+	//function for syncing reassign data from websites
+	public function sync_order()
+	{
+	    //get all active sites for syncing
+		$sites = $this->order->getAllSites();
+		foreach($sites->result() as $site)
+		{
+		   $site_id   = $site->site_id;
+		   $site_code = $site->site_code;
+		   //get reassigned orders of this site 
+		   $re_assigned_orders = $this->order->getAllReAssignOrder($site_code,$site_id);
+		   foreach($re_assigned_orders as $order_id => $user_name)
+		   {
+		       //update username to new_username in assign_orders table
+			   $this->order->changeReorderUser($order_id, $user_name, $site_id);
+		   }
+		}
+	}
 	public function servertime()
 	{
 	   echo date('h:i:sa');
