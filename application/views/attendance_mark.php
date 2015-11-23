@@ -240,7 +240,7 @@ return false;
     <label style="text-align:left;">Main representative</label>
     </div>  <div class="forbtn" style="width:390px;">
     <input name="temp_rule" id="temp_rule" type="checkbox" value="1" class="letbt">
-    <label style="text-align:left;">Temp Rule(will be removed next day)</label>
+    <label style="text-align:left;">Temp Rule(will be removed after 24 hrs)</label>
     </div>
 	<div style="clear:both;"></div>
      <div class="btnleft_rule">
