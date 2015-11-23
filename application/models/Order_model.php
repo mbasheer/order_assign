@@ -20,6 +20,12 @@ class Order_model extends CI_Model {
 		return  $this->opasa->query($sql);
 	}
 	
+	public function selectAllSites()
+	{
+	   $sql = "SELECT * FROM `sites`";
+		return  $this->opasa->query($sql);
+	}
+	
 	//get all un assigned order id from individual sites
 	//@site_code - corresponding shopping site code and database connection name
 	public function getAllNotAssignOrder($site_code)
@@ -382,7 +388,7 @@ class Order_model extends CI_Model {
 	//function get all users
 	public function getUsersList()
 	{
-	    $sql = "SELECT * FROM `users` ORDER BY `name`";
+	    $sql = "SELECT * FROM `users` where username <> 'blank' ORDER BY `name`";
 		return $this->opasa->query($sql);
 	}
 	//function get all sites
@@ -410,10 +416,11 @@ class Order_model extends CI_Model {
 	     $per_month   = $_REQUEST['per_month'];
 	     $level       = $_REQUEST['level'];
 	     $lead_repo   = $_REQUEST['lead_repo'];
+		 $temp_rule   = $_REQUEST['temp_rule'];
 		 $admin_id    = $this->session->userdata('user_id');
 		 
 		 $sql = "INSERT INTO `order_assign_rule` 
-		         (`rule_id`, `username`, `site_id`, `per_month`, `min_order_amount`, `max_order_amount`, `rule_priority`, `lead_repo`,created_date,updated_date,updated_by)                 VALUES (NULL, '$username', '$site_id', '$per_month', '$value_from', '$value_to', '$level', '$lead_repo',NOW(),NOW(),'$admin_id')";
+		         (`rule_id`, `username`, `site_id`, `per_month`, `min_order_amount`, `max_order_amount`, `rule_priority`, `lead_repo`,created_date,updated_date,updated_by,is_temp)                 VALUES (NULL, '$username', '$site_id', '$per_month', '$value_from', '$value_to', '$level', '$lead_repo',NOW(),NOW(),'$admin_id','$temp_rule')";
 		 if($this->opasa->query($sql))
 		 {
 		    return $this->opasa->insert_id();
@@ -477,7 +484,7 @@ class Order_model extends CI_Model {
 		//avoid old orders
 		//select order only from one week time frame
 		$query_assigned_site = "select a.order_id,b.username from `order` a join user b on a.customer_assign = b.user_id 
-		                        where (a.date_added > DATE_SUB(NOW(), INTERVAL 7 DAY) or a.date_modified > DATE_SUB(NOW(), INTERVAL 7 Day))";
+		                        where (a.date_added > DATE_SUB(NOW(), INTERVAL 10 DAY) or a.date_modified > DATE_SUB(NOW(), INTERVAL 10 Day)) and a.order_status_id not in(2,45)";
 		$sql_assigned_site   = $this->site_db->query($query_assigned_site); 
 		//add this result to array for comparison
 		$site_order_array = array(); 
@@ -488,7 +495,7 @@ class Order_model extends CI_Model {
 		  $site_order_array[$order_id] = $user_name;
 		}
 		//get assigned order from opas table
-		$assigned_order_query = "select username, order_id from assign_orders where assign_date > DATE_SUB(NOW(), INTERVAL 7 DAY) and site_id = '$site_id'"	;
+		$assigned_order_query = "select username, order_id from assign_orders where assign_date > DATE_SUB(NOW(), INTERVAL 13 DAY) and site_id = '$site_id'"	;
 		$assigned_order_sql   = $this->opasa->query($assigned_order_query); 
 		//add this result to array for comparison
 		$opas_order_array = array(); 
@@ -507,4 +514,39 @@ class Order_model extends CI_Model {
 	    $sql = "update assign_orders set username = '$user_name' where site_id = '$site_id' and order_id = '$order_id'";
 		$this->opasa->query($sql);
 	}
+	//delete temp rule
+	public function deleteTempRule()
+	{
+	    $sql = "delete from order_assign_rule where date(created_date) < CURDATE() and is_temp = 1";
+		$this->opasa->query($sql);
+	}
+	
+	//getallassigned order from website
+	public function getAllordersBySite($site_id,$site_code)
+	{
+	    $CI = &get_instance();
+		$this->site_db = $CI->load->database($site_code, TRUE);
+		
+		$sql_assignedOrders = $this->site_db->query("SELECT a.order_id, a.date_added, b.username FROM `order` a JOIN user b ON a.customer_assign = b.user_id WHERE a.customer_assign <>0 AND (a.date_added > DATE_SUB( NOW( ) , INTERVAL 30 DAY ))");
+		return $sql_assignedOrders;
+	}
+	
+	//sync wesite orders to opas table
+	//if order is already in table no action
+	//else insert into assign order table<br />
+    public function syncOrder($site_id,$order_id,$username,$dateadded)
+	{
+	    //check this order is present in opas table
+		//else insert
+		$check_sql = $this->opasa->query("select * from assign_orders where order_id = '$order_id' and site_id ='$site_id'");
+		if($check_sql->num_rows() < 1)
+		{
+		  //insert
+		  //insert order assign details to master database  
+		   $sql    = "INSERT INTO `assign_orders` (`id`, `username`, `site_id`, `order_id`, `assign_date`) 
+				           VALUES (NULL, '$username', '$site_id', '$order_id', '$dateadded')";
+		   $this->opasa->query($sql);	
+		}
+	}
+	
 }

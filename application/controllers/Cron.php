@@ -26,6 +26,8 @@ class Cron extends CI_Controller {
 		//else create attendance with full present
 		$is_attendance = $this->attendance->checkAttendance(date('Y-m-d'));
 		if(!$is_attendance){$this->attendance->markDefaultAttendance();}
+		//remove temp rule , if any previous temp rule 
+	    $this->order->deleteTempRule();
 		//assign orders from all sites . one by one 
 		//slecet all site_id and corresponding database from sites table
 		$sites = $this->order->getAllSites();
@@ -92,7 +94,28 @@ class Cron extends CI_Controller {
 		   foreach($re_assigned_orders as $order_id => $user_name)
 		   {
 		       //update username to new_username in assign_orders table
-			   $this->order->changeReorderUser($order_id, $user_name, $site_id);
+			    $this->order->changeReorderUser($order_id, $user_name, $site_id);
+		   }
+		}
+	}
+	
+	//sync full assign orders to opas table , last month orders
+	public function syncing()
+	{
+	    //$sites = $this->opasa->query("select site_id,site_code from sites where site_id =1");
+		$sites = $this->order->selectAllSites();
+		foreach($sites->result() as $site)
+		{
+		   $site_id     = $site->site_id;
+		   $site_code   = $site->site_code;
+		   $all_orders  = $this->order->getAllordersBySite($site_id,$site_code);
+		   //check one by one, these order is in assign_orders table
+		   foreach($all_orders->result() as $orders)
+		   {
+		      $order_id  = $orders->order_id;
+			  $username  = $orders->username;
+			  $dateadded = $orders->date_added;
+			  $this->order->syncOrder($site_id,$order_id,$username,$dateadded);
 		   }
 		}
 	}

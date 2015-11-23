@@ -216,3 +216,7 @@ form > div > label,legend{text-align:right}
     font-size: 14px;
     text-decoration: none;}
 	.runrule a:hover{ text-decoration:underline;}
+	#absent_info{float: left;
+    padding: 32px 0 0 10px;;
+    text-align: left;color:#FF0000;}
+	.btnleft_rule{margin:5px 0 0 25px;}
