@@ -1,0 +1,1 @@
+ALTER TABLE `order_assign_rule` ADD `is_temp` INT NULL DEFAULT '0' ;
