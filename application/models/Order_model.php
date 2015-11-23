@@ -39,7 +39,7 @@ class Order_model extends CI_Model {
 		//this ithe correct sql, commented only for testing 
 		$sql  = "SELECT `order_id`,`date_added`, total, createduser_id, email FROM `order` 
 		         WHERE (`customer_assign` = 0 or customer_assign IS NULL) AND (date_added > DATE_SUB(NOW(), INTERVAL 1 WEEK) or date_modified > DATE_SUB(NOW(), INTERVAL 1 WEEK)) 
-				 AND order_status_id not in(2,45)
+				 AND order_status_id not in(2,45,47)
 				 order by date_added";	
 		/*$sql  = "SELECT `order_id`,`date_added`, total FROM `order` 
 		         WHERE (`customer_assign` = 0 or customer_assign IS NULL)
@@ -359,7 +359,7 @@ class Order_model extends CI_Model {
 	{
 	   //select prevoius order from this email id , assigned <> 0 
 	   $query_reorder   = "SELECT a.username  FROM `user` a join `order` b on a.user_id = b.`customer_assign` 
-	                       WHERE b.`customer_assign` <> 0 and b.`email` = '$email' and b.`order_id` <> '$order_id' order by b.`date_modified` desc limit 1";
+	                       WHERE b.`customer_assign` <> 0 and b.`email` = '$email' and b.`order_id` <> '$order_id' and b.order_status_id not in(2,47,45) order by b.`date_modified` desc limit 1";
 	   $sql_reorder     = $this->site_db->query($query_reorder);
 	   if($sql_reorder->num_rows()<1)
 	   {
@@ -484,7 +484,7 @@ class Order_model extends CI_Model {
 		//avoid old orders
 		//select order only from one week time frame
 		$query_assigned_site = "select a.order_id,b.username from `order` a join user b on a.customer_assign = b.user_id 
-		                        where (a.date_added > DATE_SUB(NOW(), INTERVAL 10 DAY) or a.date_modified > DATE_SUB(NOW(), INTERVAL 10 Day)) and a.order_status_id not in(2,45)";
+		                        where (a.date_added > DATE_SUB(NOW(), INTERVAL 10 DAY) or a.date_modified > DATE_SUB(NOW(), INTERVAL 10 Day)) and a.order_status_id not in(2,45,47)";
 		$sql_assigned_site   = $this->site_db->query($query_assigned_site); 
 		//add this result to array for comparison
 		$site_order_array = array(); 
