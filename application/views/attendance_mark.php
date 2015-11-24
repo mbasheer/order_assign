@@ -183,7 +183,7 @@ return false;
     <div class="tablen">
 	 <div style="color:red;"><?php echo $msg;?></div>
       <div class="btnleft">
-        <?php if($restrict!=1){?><input id="saveForm"  name="save" type="submit" value="Submit" onClick="submtfrm();"></form>
+        <?php if($restrict!=1){?><input id="saveForm"  name="save" type="submit" value="Save" onClick="submtfrm();"></form>
 		<?php } else echo '<span style="color:red">Attendance marking allowed only till 9 AM, please contact administrator</span>';?>
       </div>
     </div>
@@ -240,13 +240,13 @@ return false;
     <label style="text-align:left;">Main representative</label>
     </div>  <div class="forbtn" style="width:390px;">
     <input name="temp_rule" id="temp_rule" type="checkbox" value="1" class="letbt">
-    <label style="text-align:left;">Temp Rule(will be removed after 24 hrs)</label>
+    <label style="text-align:left;">This rule will be removed after 24 hrs</label>
     </div>
 	<div style="clear:both;"></div>
      <div class="btnleft_rule">
      
        
-          <input id="saveForm"  type="submit" value="Submit" class="subf">
+          <input id="saveForm"  type="submit" value="Add Rule" class="subf">
       
       </div>
     </form>
@@ -256,8 +256,8 @@ return false;
     <table width="100%" border="0" class="imagetable" id="update" >
       <thead>
 	  <tr>
-       <th width="18%" scope="col">Employee</th>
-        <th width="18%" scope="col">Site Code</th>
+       <th width="21%" scope="col">Employee</th>
+        <th width="15%" scope="col">Site Code</th>
         <th width="12%" scope="col">Value From($)</th>
         <th width="12%" scope="col">Value To($)</th>
         <th width="9%" scope="col">Per Month</th>
@@ -269,7 +269,7 @@ return false;
 	  <tbody>
 	  <?php foreach($rules->result() as $rule) {?>
       <tr id="rule_<?php echo $rule->rule_id;?>" <?php if($rule->is_temp == 1){echo "style='color:#3399CC;font-weight:bold;'";}?> >
-        <td><?php echo $rule->name;if($rule->is_temp == 1){echo " (Temp)";}?></td>
+        <td><?php echo $rule->name;if($rule->is_temp == 1){echo " (Only for 24 hrs)";}?></td>
         <td><?php echo $rule->site_code;?></td>
         <td><?php echo $rule->min_order_amount;?></td>
         <td><?php echo $rule->max_order_amount;?></td>
