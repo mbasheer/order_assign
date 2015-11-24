@@ -62,10 +62,8 @@ $(".subf").click(function() {
 	var per_month = $("#per_month").val();
 	var level   = $("#levels").val();
 	var lead_repo = 0;
-	var temp_rule = 0;
 	if($('#lead_repo').prop("checked") == true){lead_repo = 1;}
-	if($('#temp_rule').prop("checked") == true){temp_rule = 1;}
-    var dataString = 'username='+ username+'&site_id='+site_id+'&value_from='+value_from+'&value_to='+value_to+'&per_month='+per_month+'&level='+level+'&lead_repo='+lead_repo+'&temp_rule='+temp_rule;
+    var dataString = 'username='+ username+'&site_id='+site_id+'&value_from='+value_from+'&value_to='+value_to+'&per_month='+per_month+'&level='+level+'&lead_repo='+lead_repo;
 	if(username=='')
 	{
 	 alert("Please Select Employee");
@@ -238,10 +236,7 @@ return false;
      <div class="forbtn">
     <input name="lead_repo" id="lead_repo" type="checkbox" value="1" class="letbt">
     <label style="text-align:left;">Main representative</label>
-    </div>  <div class="forbtn" style="width:390px;">
-    <input name="temp_rule" id="temp_rule" type="checkbox" value="1" class="letbt">
-    <label style="text-align:left;">This rule will be removed after 24 hrs</label>
-    </div>
+    </div>  
 	<div style="clear:both;"></div>
      <div class="btnleft_rule">
      
@@ -268,8 +263,8 @@ return false;
 	  </thead>
 	  <tbody>
 	  <?php foreach($rules->result() as $rule) {?>
-      <tr id="rule_<?php echo $rule->rule_id;?>" <?php if($rule->is_temp == 1){echo "style='color:#3399CC;font-weight:bold;'";}?> >
-        <td><?php echo $rule->name;if($rule->is_temp == 1){echo " (Only for 24 hrs)";}?></td>
+      <tr id="rule_<?php echo $rule->rule_id;?>"  >
+        <td><?php echo $rule->name;?></td>
         <td><?php echo $rule->site_code;?></td>
         <td><?php echo $rule->min_order_amount;?></td>
         <td><?php echo $rule->max_order_amount;?></td>

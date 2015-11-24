@@ -416,11 +416,10 @@ class Order_model extends CI_Model {
 	     $per_month   = $_REQUEST['per_month'];
 	     $level       = $_REQUEST['level'];
 	     $lead_repo   = $_REQUEST['lead_repo'];
-		 $temp_rule   = $_REQUEST['temp_rule'];
 		 $admin_id    = $this->session->userdata('user_id');
 		 
 		 $sql = "INSERT INTO `order_assign_rule` 
-		         (`rule_id`, `username`, `site_id`, `per_month`, `min_order_amount`, `max_order_amount`, `rule_priority`, `lead_repo`,created_date,updated_date,updated_by,is_temp)                 VALUES (NULL, '$username', '$site_id', '$per_month', '$value_from', '$value_to', '$level', '$lead_repo',NOW(),NOW(),'$admin_id','$temp_rule')";
+		         (`rule_id`, `username`, `site_id`, `per_month`, `min_order_amount`, `max_order_amount`, `rule_priority`, `lead_repo`,created_date,updated_date,updated_by)                 VALUES (NULL, '$username', '$site_id', '$per_month', '$value_from', '$value_to', '$level', '$lead_repo',NOW(),NOW(),'$admin_id')";
 		 if($this->opasa->query($sql))
 		 {
 		    return $this->opasa->insert_id();

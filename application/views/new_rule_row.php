@@ -1,5 +1,5 @@
-<tr id="rule_<?php echo $rule->rule_id;?>" <?php if($rule->is_temp == 1){echo "style='color:#3399CC;font-weight:bold;'";}?>>
-        <td style="background-color:#00CC33;"><?php echo $rule->name;if($rule->is_temp == 1){echo " (Only for 24 hrs)";}?></td>
+<tr id="rule_<?php echo $rule->rule_id;?>">
+        <td style="background-color:#00CC33;"><?php echo $rule->name;?></td>
         <td style="background-color:#00CC33;"><?php echo $rule->site_code;?></td>
         <td style="background-color:#00CC33;"><?php echo $rule->min_order_amount;?></td>
         <td style="background-color:#00CC33;"><?php echo $rule->max_order_amount;?></td>
