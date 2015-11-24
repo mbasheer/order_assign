@@ -484,7 +484,7 @@ class Order_model extends CI_Model {
 		//avoid old orders
 		//select order only from one week time frame
 		$query_assigned_site = "select a.order_id,b.username from `order` a join user b on a.customer_assign = b.user_id 
-		                        where (a.date_added > DATE_SUB(NOW(), INTERVAL 10 DAY) or a.date_modified > DATE_SUB(NOW(), INTERVAL 10 Day)) and a.order_status_id not in(2,45,47)";
+		                        where (a.date_added > DATE_SUB(NOW(), INTERVAL 5 DAY) or a.date_modified > DATE_SUB(NOW(), INTERVAL 5 Day)) and a.order_status_id not in(2,45,47)";
 		$sql_assigned_site   = $this->site_db->query($query_assigned_site); 
 		//add this result to array for comparison
 		$site_order_array = array(); 
@@ -495,7 +495,7 @@ class Order_model extends CI_Model {
 		  $site_order_array[$order_id] = $user_name;
 		}
 		//get assigned order from opas table
-		$assigned_order_query = "select username, order_id from assign_orders where assign_date > DATE_SUB(NOW(), INTERVAL 13 DAY) and site_id = '$site_id'"	;
+		$assigned_order_query = "select username, order_id from assign_orders where assign_date > DATE_SUB(NOW(), INTERVAL 7 DAY) and site_id = '$site_id'"	;
 		$assigned_order_sql   = $this->opasa->query($assigned_order_query); 
 		//add this result to array for comparison
 		$opas_order_array = array(); 
@@ -527,7 +527,7 @@ class Order_model extends CI_Model {
 	    $CI = &get_instance();
 		$this->site_db = $CI->load->database($site_code, TRUE);
 		
-		$sql_assignedOrders = $this->site_db->query("SELECT a.order_id, a.date_added, b.username FROM `order` a JOIN user b ON a.customer_assign = b.user_id WHERE a.customer_assign <>0 AND (a.date_added > DATE_SUB( NOW( ) , INTERVAL 30 DAY ))");
+		$sql_assignedOrders = $this->site_db->query("SELECT a.order_id, a.date_added, b.username FROM `order` a JOIN user b ON a.customer_assign = b.user_id WHERE a.customer_assign <>0 AND (a.date_added > DATE_SUB( NOW( ) , INTERVAL 10 DAY ))");
 		return $sql_assignedOrders;
 	}
 	
