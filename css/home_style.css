@@ -211,10 +211,22 @@ input[type=text],input[type=email],input[type=url],input[type=password],textarea
 @media (min-width: 1200px) {
 form > div > label,legend{text-align:right}
 }
-.runrule{float:right;padding:0 7px 10px 0;color: #e0162b;font-size: 14px;}
-.runrule a{color: #e0162b;
+.runrule{ float: right;
+    padding: 0 0px 10px 0;
+    color: #e0162b;
+    font-size: 14px;}
+.runrule a{color: #e0162b; /
     font-size: 14px;
-    text-decoration: none;}
+    text-decoration: none;
+    background: #3cb0fd;
+    background-image: -webkit-linear-gradient(top,#3cb0fd,#3498db);
+    background-image: -moz-linear-gradient(top,#3cb0fd,#3498db);
+    background-image: -ms-linear-gradient(top,#3cb0fd,#3498db);
+    background-image: -o-linear-gradient(top,#3cb0fd,#3498db);
+    background-image: linear-gradient(to bottom,#3cb0fd,#3498db);
+    text-decoration: none;
+    padding: 6px;
+    color: white;}
 	.runrule a:hover{ text-decoration:underline;}
 	#absent_info{float: left;
     padding: 32px 0 0 10px;;
