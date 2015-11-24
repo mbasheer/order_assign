@@ -78,21 +78,13 @@ class Order_model extends CI_Model {
 		$reorder_repo     = $this->checkReOrder($order_id, $cust_email);
 		if($reorder_repo)
 		{
-		   //check this username is present today
-		   // and also check this user still in that site's rule list
+		   //check check this user still in that site's rule list
 		   //otherwise this order act as a normal order 
-		   $present_status_sql = $this->opasa->query("select a.present from attendance a join order_assign_rule b on a.username = b.username 
-		                                              where a.username = '$reorder_repo' and a.work_date = CURDATE() and b.site_id = $site_id");
+		   $present_status_sql = $this->opasa->query("select rule_id from order_assign_rule where username = '$reorder_repo' and site_id = $site_id");
            //if username 
 		   if($present_status_sql->num_rows() >  0)	
 		   {												  
-			   $present_status_row = $present_status_sql->row();
-			   $present_status     = $present_status_row->present;
-			   //copied userr is presnet return 
-			   if($present_status == 1)
-			   {
-				 return $reorder_repo; //parent order assigned username
-			   }
+			   return $reorder_repo; //parent order assigned username
 		   }	 
 		}
 		
@@ -113,10 +105,41 @@ class Order_model extends CI_Model {
 		//if no result assign to lead_repo user
 		if($sql_best_user_frst->num_rows() < 1) //if no user match the rule
 		{
-		    //check more than one lead repo
+		    //get lead repo
+			$assigned_user = $this->getLeadRepo($site_id);
+		}
+		else
+		{
+		     //check that users limits the daily order permit
+		     //remove  user who cross the daily limit
+		     $users_after_daily_check = $this->filterDailyLimit($sql_best_user_frst); //array
+			 //if no best user , check if any lead repo
+			 if($users_after_daily_check == 0)
+			 {
+			    $assigned_user = $this->getLeadRepo($site_id);
+			 } 
+			 //if array contain only one user set that user as $assigned_user
+			 //else solve conflict
+			 else if(count($users_after_daily_check)==1)
+			 {
+			    $assigned_user = array_shift($users_after_daily_check);
+			 }
+			 else
+			 {
+			    $assigned_user = $this->solveConflict($users_after_daily_check,$site_id);
+			 }
+		}
+		
+		return $assigned_user;
+	}
+	
+	//get lead repo of site
+	public function getLeadRepo($site_id)
+	{
+	       //check more than one lead repo
 		   //if yes slect best usernam efrom that
 		     $best_lead_repo      = "select a.username from order_assign_rule a join attendance b on a.username = b.username 
-			                         where a.lead_repo = 1 and a.site_id = $site_id and b.work_date = CURDATE() and b.present = 1";
+			                         where a.lead_repo = 1 and a.site_id = $site_id";
 			 $sql_best_lead_repo  = $this->opasa->query($best_lead_repo);
 			 if($sql_best_lead_repo->num_rows() == 1) //if only one user match the rule
 		     {
@@ -135,26 +158,11 @@ class Order_model extends CI_Model {
 			   }
 			   $assigned_user = $this->solveConflict($user_array,$site_id);
 		     }
-		}
-		else
-		{
-		     //check that users limits the daily order permit
-		     //remove  user who cross the daily limit
-		     $users_after_daily_check = $this->filterDailyLimit($sql_best_user_frst); //array
-			 if($users_after_daily_check == 0){return 0;} // no result return 0;
-			 //if array contain only one user set that user as $assigned_user
-			 //else solve conflict
-			 if(count($users_after_daily_check)==1)
-			 {
-			    $assigned_user = array_shift($users_after_daily_check);
-			 }
 			 else
 			 {
-			    $assigned_user = $this->solveConflict($users_after_daily_check,$site_id);
+			    $assigned_user = 0;
 			 }
-		}
-		
-		return $assigned_user;
+			 return $assigned_user;
 	}
 	
 	//input- sql result with username and this month assigned order count and monthly limit

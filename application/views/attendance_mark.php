@@ -7,43 +7,7 @@
 <script type="text/javascript">$(document).ready(function(){$(".tabs-menu a").click(function(b){b.preventDefault();$(this).parent().addClass("current");$(this).parent().siblings().removeClass("current");var a=$(this).attr("href");$(".tab-content").not(a).css("display","none");$(a).fadeIn()})});</script>
   <script>
     function moveSelected(from, to) {
-	    //alert($('#'+from+' option:selected').val());
-		if(from == 'from')
-		{
-		   $('#'+from+' :selected').each(function(i, selected){ 
-            var selected_user = $(selected).val(); 
-			var selected_name = $(selected).text();
-			 //check this user is unique user for any site
-			 $.ajax({
-		     type: "POST",
-             url: "<?php echo base_url()?>index.php/attendance/check_unique_user",
-             data: 'selected_user='+selected_user+'&name='+selected_name,
-             cache: false,
-             success: function(html){
-			      if(html !=0)
-				  {
-		          $("#absent_info").html(html);
-		           $("#absent_info").show();
-		           $("#absent_info").delay(5000).fadeOut("slow");
-				    //$('#'+from+' option[value="'+selected_user+'"]').prop("selected", false);
-                   }
-				   else
-				   {
-				       $('#'+from+' option:selected').remove().appendTo('#'+to);
-				   }
-				   
-				                }	   
-                 });
-			 //end ajax
-			 //$('#'+from+' option[value="shyni"]').prop("selected", false);
-			 
-            });
-		 }
-		 else
-		 {
 		  $('#'+from+' option:selected').remove().appendTo('#'+to);
-		}
-                
     }
 	function submtfrm()
 	{
