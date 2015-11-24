@@ -20,6 +20,12 @@ class Order_model extends CI_Model {
 		return  $this->opasa->query($sql);
 	}
 	
+	public function selectAllSites()
+	{
+	   $sql = "SELECT * FROM `sites`";
+		return  $this->opasa->query($sql);
+	}
+	
 	//get all un assigned order id from individual sites
 	//@site_code - corresponding shopping site code and database connection name
 	public function getAllNotAssignOrder($site_code)
@@ -31,9 +37,9 @@ class Order_model extends CI_Model {
 		//select only from one week time frame
 		
 		//this ithe correct sql, commented only for testing 
-		$sql  = "SELECT `order_id`,`date_added`, total FROM `order` 
+		$sql  = "SELECT `order_id`,`date_added`, total, createduser_id, email FROM `order` 
 		         WHERE (`customer_assign` = 0 or customer_assign IS NULL) AND (date_added > DATE_SUB(NOW(), INTERVAL 1 WEEK) or date_modified > DATE_SUB(NOW(), INTERVAL 1 WEEK)) 
-				 AND order_status_id not in(2,45)
+				 AND order_status_id not in(2,45,47)
 				 order by date_added";	
 		/*$sql  = "SELECT `order_id`,`date_added`, total FROM `order` 
 		         WHERE (`customer_assign` = 0 or customer_assign IS NULL)
@@ -42,8 +48,8 @@ class Order_model extends CI_Model {
 	}
 	
 	//return assigned username
-	//input - site id , order id and price
-	public function orderAssignUser($site_id,$order_id,$order_price,$site_code)
+	//input - site id , order id, email, created user_id (o- craeted by customer itself), and price
+	public function orderAssignUser($site_id,$order_id,$cust_email, $order_price,$site_code,$createduser)
 	{
 	    $assigned_user = 0;
 		//if order is blank that order directly assigned to blank user with our any further checking
@@ -56,21 +62,37 @@ class Order_model extends CI_Model {
 		   return 'blank';
 		}
 		
-		//if this order is a re-order(copy) of another order , assigned to same user
-		//return parent order assigned user , if copied order
+		//check this order created by our staff other than customer assign to that staff 
+		if($createduser != 0)
+		{
+		   //if any created user id
+		   //gt that username from user_id
+		   $username = $this->getUsernamefromId($createduser);
+		   if($username){return $username;}
+		}
+		
+		
+		//if this order is a copy/reorder of another order , assigned to same user
+		//return previous order asisgne drepo name 
 		//else return 0
-		$is_copy  = $this->checkCopiedOrder($order_id);
-		if($is_copy)
+		$reorder_repo     = $this->checkReOrder($order_id, $cust_email);
+		if($reorder_repo)
 		{
 		   //check this username is present today
+		   // and also check this user still in that site's rule list
 		   //otherwise this order act as a normal order 
-		   $present_status_sql = $this->opasa->query("select present from attendance where username = '$is_copy' and work_date = CURDATE()");
-		   $present_status_row = $present_status_sql->row();
-		   $present_status     = $present_status_row->present;
-		   //copied userr is presnet return 
-		   if($present_status == 1)
-		   {
-		     return $is_copy; //parent order assigned username
+		   $present_status_sql = $this->opasa->query("select a.present from attendance a join order_assign_rule b on a.username = b.username 
+		                                              where a.username = '$reorder_repo' and a.work_date = CURDATE() and b.site_id = $site_id");
+           //if username 
+		   if($present_status_sql->num_rows() >  0)	
+		   {												  
+			   $present_status_row = $present_status_sql->row();
+			   $present_status     = $present_status_row->present;
+			   //copied userr is presnet return 
+			   if($present_status == 1)
+			   {
+				 return $reorder_repo; //parent order assigned username
+			   }
 		   }	 
 		}
 		
@@ -79,16 +101,7 @@ class Order_model extends CI_Model {
 		//threshold - max order per month where MONTH(CURDATE())=MONTH(assign_date)
 		//first round chek , 
 		//get all user satisfy the assign rule with this order id 
-		/* $best_user_first  = "select count(a.order_id) as ordercount,b.username,b.per_month,b.rule_priority,b.site_id,c.present 
-		                       from order_assign_rule b
-		                          left join assign_orders a 
-							      ON a.username = b.username AND MONTH(CURDATE())= MONTH(assign_date) AND YEAR(CURDATE())=YEAR(assign_date) 
-						          and a.site_id = $site_id
-								  join attendance c on  b.username = c.username and c.work_date = CURDATE()
-		                          where b.site_id = $site_id AND ((b.max_order_amount > $order_price AND b.min_order_amount <= $order_price) 
-							      OR (b.max_order_amount = '' AND b.min_order_amount <= $order_price))
-							      group by b.username,b.per_month,b.rule_priority,b.site_id,c.present";*/
-								  
+										  
 		$best_user_first  = "SELECT a.username,a.site_id,a.`per_month`,a.`rule_priority`,b.present from order_assign_rule a 
                             join attendance b on a.username = b.username 
                             where b.work_date = CURDATE() and a.site_id = $site_id 
@@ -339,38 +352,43 @@ class Order_model extends CI_Model {
 	   }
 	}
 	
-	//check order is copied from another order
-	//if yes rturn parent order assigned username
+	//check this order email have previous order
+	//if yes return just previous order assigned username
 	//else return 0
-	function checkCopiedOrder($order_id)
+	function checkReOrder($order_id, $email)
 	{
-	   //get order history comment of order and check 
-	   $query_copy_comment = "SELECT comment FROM `order_history` WHERE lower(`comment`) LIKE 'copied from%' and order_id = '$order_id' ORDER BY `date_added` limit 1";
-	   $sql_copy_comment   = $this->site_db->query($query_copy_comment);
-	   if($sql_copy_comment->num_rows()<1)
+	   //select prevoius order from this email id , assigned <> 0 
+	   $query_reorder   = "SELECT a.username  FROM `user` a join `order` b on a.user_id = b.`customer_assign` 
+	                       WHERE b.`customer_assign` <> 0 and b.`email` = '$email' and b.`order_id` <> '$order_id' and b.order_status_id not in(2,47,45) order by b.`date_modified` desc limit 1";
+	   $sql_reorder     = $this->site_db->query($query_reorder);
+	   if($sql_reorder->num_rows()<1)
 	   {
-          //if no copied from comment return 0
+          //if no reorder or no prevoius assigned order
 		  return 0;	   
 	   }
-	   $row_copy_comment   = $sql_copy_comment->row();
-	   $copy_comment       = $row_copy_comment->comment; // 	Copied from SGV15051804
-	   $parent_order_id    = trim(str_replace('Copied from ','',$copy_comment)); // SGV15051804
-	   //get parent order's assigned username
-	   $query_assigned     = "select a.username from `user` a join `order` b on b.customer_assign = a.user_id where b.order_id = '$parent_order_id' ";
-	   $sql_assigned       = $this->site_db->query($query_assigned);
-	   //if no username
-	   if($sql_assigned->num_rows() < 1)
-	   {
-	      return 0;
-	   }
-	   $row_assigned       = $sql_assigned->row();
-	   return $row_assigned->username;
+	   
+	   $row_reorder     = $sql_reorder->row();
+	   return $row_reorder->username;
+	  
+	}
+	
+	//return usernmae from user_id
+	function getUsernamefromId($createduser)
+	{
+	    $query_user  = "SELECT `username` FROM `user` WHERE `user_id`='$createduser'";
+		$sql_user    = $this->site_db->query($query_user);
+		if($sql_user->num_rows() < 1)
+		{
+		  return 0;
+		}
+		$row_user = $sql_user->row();
+		return $row_user->username;
 	}
 	
 	//function get all users
 	public function getUsersList()
 	{
-	    $sql = "SELECT * FROM `users` ORDER BY `name`";
+	    $sql = "SELECT * FROM `users` where username <> 'blank' ORDER BY `name`";
 		return $this->opasa->query($sql);
 	}
 	//function get all sites
@@ -398,10 +416,11 @@ class Order_model extends CI_Model {
 	     $per_month   = $_REQUEST['per_month'];
 	     $level       = $_REQUEST['level'];
 	     $lead_repo   = $_REQUEST['lead_repo'];
+		 $temp_rule   = $_REQUEST['temp_rule'];
 		 $admin_id    = $this->session->userdata('user_id');
 		 
 		 $sql = "INSERT INTO `order_assign_rule` 
-		         (`rule_id`, `username`, `site_id`, `per_month`, `min_order_amount`, `max_order_amount`, `rule_priority`, `lead_repo`,created_date,updated_date,updated_by)                 VALUES (NULL, '$username', '$site_id', '$per_month', '$value_from', '$value_to', '$level', '$lead_repo',NOW(),NOW(),'$admin_id')";
+		         (`rule_id`, `username`, `site_id`, `per_month`, `min_order_amount`, `max_order_amount`, `rule_priority`, `lead_repo`,created_date,updated_date,updated_by,is_temp)                 VALUES (NULL, '$username', '$site_id', '$per_month', '$value_from', '$value_to', '$level', '$lead_repo',NOW(),NOW(),'$admin_id','$temp_rule')";
 		 if($this->opasa->query($sql))
 		 {
 		    return $this->opasa->insert_id();
@@ -451,4 +470,83 @@ class Order_model extends CI_Model {
 		 $row  = $sql->row();
 		 return $row->setting_value;
 	}
+	
+	
+	//return diff order with changed username
+	//first create a temporary table , values of all order assigned details from opasa db 
+	//then get all orders from website 
+	//compare both table and return all orders of mismatched assigned username 
+	public function getAllReAssignOrder($site_code,$site_id)
+	{
+	    $CI = &get_instance();
+		$this->site_db = $CI->load->database($site_code, TRUE);
+		//get order_ids
+		//avoid old orders
+		//select order only from one week time frame
+		$query_assigned_site = "select a.order_id,b.username from `order` a join user b on a.customer_assign = b.user_id 
+		                        where (a.date_added > DATE_SUB(NOW(), INTERVAL 5 DAY) or a.date_modified > DATE_SUB(NOW(), INTERVAL 5 Day)) and a.order_status_id not in(2,45,47)";
+		$sql_assigned_site   = $this->site_db->query($query_assigned_site); 
+		//add this result to array for comparison
+		$site_order_array = array(); 
+		foreach($sql_assigned_site->result() as $row_assigned_site)
+		{
+		  $user_name = $row_assigned_site->username;
+		  $order_id  = $row_assigned_site->order_id;
+		  $site_order_array[$order_id] = $user_name;
+		}
+		//get assigned order from opas table
+		$assigned_order_query = "select username, order_id from assign_orders where assign_date > DATE_SUB(NOW(), INTERVAL 7 DAY) and site_id = '$site_id'"	;
+		$assigned_order_sql   = $this->opasa->query($assigned_order_query); 
+		//add this result to array for comparison
+		$opas_order_array = array(); 
+		foreach($assigned_order_sql->result() as $assigned_order_row)
+		{
+		  $user_name = $assigned_order_row->username;
+		  $order_id  = $assigned_order_row->order_id;
+		  $opas_order_array[$order_id] = $user_name;
+		}
+		$diff_orders = array_diff_assoc($site_order_array, $opas_order_array)	;
+		return $diff_orders;  
+	}
+	
+	public function changeReorderUser($order_id, $user_name, $site_id)
+	{
+	    $sql = "update assign_orders set username = '$user_name' where site_id = '$site_id' and order_id = '$order_id'";
+		$this->opasa->query($sql);
+	}
+	//delete temp rule
+	public function deleteTempRule()
+	{
+	    $sql = "delete from order_assign_rule where date(created_date) < CURDATE() and is_temp = 1";
+		$this->opasa->query($sql);
+	}
+	
+	//getallassigned order from website
+	public function getAllordersBySite($site_id,$site_code)
+	{
+	    $CI = &get_instance();
+		$this->site_db = $CI->load->database($site_code, TRUE);
+		
+		$sql_assignedOrders = $this->site_db->query("SELECT a.order_id, a.date_added, b.username FROM `order` a JOIN user b ON a.customer_assign = b.user_id WHERE a.customer_assign <>0 AND (a.date_added > DATE_SUB( NOW( ) , INTERVAL 10 DAY ))");
+		return $sql_assignedOrders;
+	}
+	
+	//sync wesite orders to opas table
+	//if order is already in table no action
+	//else insert into assign order table<br />
+    public function syncOrder($site_id,$order_id,$username,$dateadded)
+	{
+	    //check this order is present in opas table
+		//else insert
+		$check_sql = $this->opasa->query("select * from assign_orders where order_id = '$order_id' and site_id ='$site_id'");
+		if($check_sql->num_rows() < 1)
+		{
+		  //insert
+		  //insert order assign details to master database  
+		   $sql    = "INSERT INTO `assign_orders` (`id`, `username`, `site_id`, `order_id`, `assign_date`) 
+				           VALUES (NULL, '$username', '$site_id', '$order_id', '$dateadded')";
+		   $this->opasa->query($sql);	
+		}
+	}
+	
 }

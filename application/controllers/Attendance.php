@@ -137,6 +137,35 @@ class Attendance extends CI_Controller {
 	   $this->session->sess_destroy();
 	    redirect(base_url().'index.php');
 	}
+	
+	//check user is one and only one repo for any site
+	//return sites names
+	//else return 0
+	public function check_unique_user()
+	{
+	   $user_name = $_POST['selected_user'];
+	   $name = $_POST['name'];
+	   $sites     = $this->attendance->getSites_only_oneuser($user_name);
+	   if($sites->num_rows() < 1)
+	   {
+	      echo 0;
+	   }
+	   else
+	   {
+	     $msg = 'The Associate handles multiple products alone, so please contact the Administrator';
+		 foreach($sites->result() as $site)
+		 {
+		   $site_name = $site->site_code;
+		   $username = $site->username;
+		   if($username != $user_name)
+		   {
+		     echo 0;return;
+		   }
+		   
+		 }
+		 echo $msg;
+	   }
+	}
 
 }
 

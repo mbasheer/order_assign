@@ -17,7 +17,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 | environments.
 |
 */
-$config['base_url'] = 'http://server/order_assign/';
+$config['base_url'] = 'http://localhost/order_assign/';
 
 /*
 |--------------------------------------------------------------------------

@@ -37,7 +37,7 @@ class Attendance_model extends CI_Model {
 	//mark attendance with full presnet in today date
 	public function markDefaultAttendance()
 	{
-	    $sql_all = $this->opasa->query("select username from users order by name");
+	    $sql_all = $this->opasa->query("select username from users where username <> 'blank' order by name");
 		$values ='';
 		foreach($sql_all->result() as $row)
 		{
@@ -87,5 +87,14 @@ class Attendance_model extends CI_Model {
 		$sql = $this->opasa->query($sql);
 		$row = $sql->row();
 		return $row->attendance_time_limit;
+	}
+	
+	//get all sites: condition -> this is the only one user for this sites available for today nd all othesr are absent or only one user is assigned for this site
+	public function getSites_only_oneuser($user_name)
+	{
+		$query_sites = "select count(a.username) as users,c.site_code,a.username from order_assign_rule a join attendance b on a.username = b.username join sites c on a.site_id = c.site_id where b.present =1 and b.work_date = CURDATE() and a.site_id in(select site_id from order_assign_rule where username = '$user_name') group by a.site_id having users = 1";
+		$sql_sites   = $this->opasa->query($query_sites);
+		return $sql_sites;
+		
 	}
 }	
