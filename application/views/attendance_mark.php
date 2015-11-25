@@ -215,11 +215,12 @@ return false;
     <table width="100%" border="0" class="imagetable" id="update" >
       <thead>
 	  <tr>
-       <th width="21%" scope="col">Employee</th>
-        <th width="15%" scope="col">Site Code</th>
+       <th width="15%" scope="col">Employee</th>
+        <th width="10%" scope="col">Site Code</th>
         <th width="12%" scope="col">Value From($)</th>
         <th width="12%" scope="col">Value To($)</th>
         <th width="9%" scope="col">Per Month</th>
+		<th width="12%" scope="col">Assigned orders</th>
 		 <th width="10%" scope="col">Level</th>
         <th width="11%" scope="col">Main Repo</th>
         <th width="10%" scope="col">Action</th>
@@ -233,6 +234,7 @@ return false;
         <td><?php echo $rule->min_order_amount;?></td>
         <td><?php echo $rule->max_order_amount;?></td>
         <td><?php echo $rule->per_month;?></td>
+		<td><?php echo $rule->month_cnt;?></td>
         <td><?php echo $rule->rule_priority;?></td>
 		<td><?php echo $a = $rule->lead_repo?'Yes':'No';?></td>
         <td><a href="#" class="delete"><img src="<?php echo base_url()?>images/gnome_edit_delete.png" width="24" height="24" /></a>&nbsp;&nbsp;<a href="#" class="editbtn"><img src="<?php echo base_url()?>images/list_edit.png" width="20" height="20" /></a></td>

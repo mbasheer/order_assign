@@ -407,8 +407,13 @@ class Order_model extends CI_Model {
 	//get all available rules
 	public function getRuleList()
 	{
-	    $sql = "select a.*,b.site_code,b.site_name,c.name from order_assign_rule a 
-		        join sites b on a.site_id = b.site_id join users c on a.username = c.username order by b.site_code,a.rule_priority,a.lead_repo";
+	    $sql = "select a.*,b.site_code,b.site_name,c.name,count(d.id) as month_cnt 
+		        from order_assign_rule a join sites b on a.site_id = b.site_id 
+			    join users c on a.username = c.username 
+				left join assign_orders d on a.username = d.username and a.site_id = d.site_id 
+				and MONTH(d.assign_date) = MONTH(CURDATE()) and YEAR(d.assign_date) = YEAR(CURDATE())
+				group by b.site_code,b.site_name,c.name 
+				order by b.site_code,a.rule_priority,a.lead_repo";
 		return $this->opasa->query($sql);		
 	}
 	
@@ -437,8 +442,11 @@ class Order_model extends CI_Model {
 	//get rule details by rule id\
 	public function getRulebyId($rule_id)
 	{
-	     $sql  = "select a.*,b.site_code,b.site_name,c.name from order_assign_rule a 
-		          join sites b on a.site_id = b.site_id join users c on a.username = c.username WHERE `rule_id`=$rule_id";
+	     $sql  = "select a.*,b.site_code,b.site_name,c.name,count(d.id) as month_cnt 
+		          from order_assign_rule a 
+		          join sites b on a.site_id = b.site_id join users c on a.username = c.username
+				  left join assign_orders d on a.username = d.username and a.site_id = d.site_id and MONTH(d.assign_date) = MONTH(CURDATE()) and YEAR(d.assign_date) = YEAR(CURDATE()) 
+				  WHERE `rule_id`=$rule_id ";
 		 return $this->opasa->query($sql);
 	}
 	

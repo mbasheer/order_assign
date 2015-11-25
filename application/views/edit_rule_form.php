@@ -12,6 +12,7 @@
         <td><input type="text" id="value_from_edit_<?php echo $rule_id;?>"  value="<?php echo $rule->min_order_amount;?>" /></td>
         <td><input type="text" id="value_to_edit_<?php echo $rule_id;?>"  value="<?php echo $rule->max_order_amount;?>" /></td>
         <td><input type="text" id="per_month_edit_<?php echo $rule_id;?>"  value="<?php echo $rule->per_month;?>" /></td>
+		 <td><?php echo $rule->month_cnt;?></td>
         <td>
 		 <select id="levels_edit_<?php echo $rule_id;?>" style="width:45px;">
 		<?php for($i=1;$i<=5;$i++) {?>
