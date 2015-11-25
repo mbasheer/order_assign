@@ -138,8 +138,7 @@ class Order_model extends CI_Model {
 	{
 	       //check more than one lead repo
 		   //if yes slect best usernam efrom that
-		     $best_lead_repo      = "select a.username from order_assign_rule a join attendance b on a.username = b.username 
-			                         where a.lead_repo = 1 and a.site_id = $site_id";
+		     $best_lead_repo      = "select a.username from order_assign_rule a where a.lead_repo = 1 and a.site_id = $site_id";
 			 $sql_best_lead_repo  = $this->opasa->query($best_lead_repo);
 			 if($sql_best_lead_repo->num_rows() == 1) //if only one user match the rule
 		     {
