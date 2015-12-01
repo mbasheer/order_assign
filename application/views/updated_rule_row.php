@@ -1,8 +1,9 @@
-        <td style="background-color:#00CC33;"><?php echo $rule->name;if($rule->is_temp == 1){echo " (Only for 24 hrs)";}?></td>
+        <td style="background-color:#00CC33;"><?php echo $rule->name;?></td>
         <td style="background-color:#00CC33;"><?php echo $rule->site_code;?></td>
         <td style="background-color:#00CC33;"><?php echo $rule->min_order_amount;?></td>
         <td style="background-color:#00CC33;"><?php echo $rule->max_order_amount;?></td>
         <td style="background-color:#00CC33;"><?php echo $rule->per_month;?></td>
+		<td style="background-color:#00CC33;"><?php echo $rule->month_cnt;?></td>
         <td style="background-color:#00CC33;"><?php echo $rule->rule_priority;?></td>
 		<td style="background-color:#00CC33;"><?php echo $a = $rule->lead_repo?'Yes':'No';?></td>
         <td style="background-color:#00CC33;"><a href="#" class="delete_<?php echo $rule->rule_id;?>"><img src="<?php echo base_url()?>images/gnome_edit_delete.png" width="24" height="24" /></a>&nbsp;&nbsp;<a href="#" class="editbtn_<?php echo $rule->rule_id;?>"><img src="<?php echo base_url()?>images/list_edit.png" width="20" height="20" /></a></td>

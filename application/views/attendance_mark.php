@@ -7,43 +7,7 @@
 <script type="text/javascript">$(document).ready(function(){$(".tabs-menu a").click(function(b){b.preventDefault();$(this).parent().addClass("current");$(this).parent().siblings().removeClass("current");var a=$(this).attr("href");$(".tab-content").not(a).css("display","none");$(a).fadeIn()})});</script>
   <script>
     function moveSelected(from, to) {
-	    //alert($('#'+from+' option:selected').val());
-		if(from == 'from')
-		{
-		   $('#'+from+' :selected').each(function(i, selected){ 
-            var selected_user = $(selected).val(); 
-			var selected_name = $(selected).text();
-			 //check this user is unique user for any site
-			 $.ajax({
-		     type: "POST",
-             url: "<?php echo base_url()?>index.php/attendance/check_unique_user",
-             data: 'selected_user='+selected_user+'&name='+selected_name,
-             cache: false,
-             success: function(html){
-			      if(html !=0)
-				  {
-		          $("#absent_info").html(html);
-		           $("#absent_info").show();
-		           $("#absent_info").delay(5000).fadeOut("slow");
-				    //$('#'+from+' option[value="'+selected_user+'"]').prop("selected", false);
-                   }
-				   else
-				   {
-				       $('#'+from+' option:selected').remove().appendTo('#'+to);
-				   }
-				   
-				                }	   
-                 });
-			 //end ajax
-			 //$('#'+from+' option[value="shyni"]').prop("selected", false);
-			 
-            });
-		 }
-		 else
-		 {
 		  $('#'+from+' option:selected').remove().appendTo('#'+to);
-		}
-                
     }
 	function submtfrm()
 	{
@@ -62,10 +26,8 @@ $(".subf").click(function() {
 	var per_month = $("#per_month").val();
 	var level   = $("#levels").val();
 	var lead_repo = 0;
-	var temp_rule = 0;
 	if($('#lead_repo').prop("checked") == true){lead_repo = 1;}
-	if($('#temp_rule').prop("checked") == true){temp_rule = 1;}
-    var dataString = 'username='+ username+'&site_id='+site_id+'&value_from='+value_from+'&value_to='+value_to+'&per_month='+per_month+'&level='+level+'&lead_repo='+lead_repo+'&temp_rule='+temp_rule;
+    var dataString = 'username='+ username+'&site_id='+site_id+'&value_from='+value_from+'&value_to='+value_to+'&per_month='+per_month+'&level='+level+'&lead_repo='+lead_repo;
 	if(username=='')
 	{
 	 alert("Please Select Employee");
@@ -238,10 +200,7 @@ return false;
      <div class="forbtn">
     <input name="lead_repo" id="lead_repo" type="checkbox" value="1" class="letbt">
     <label style="text-align:left;">Main representative</label>
-    </div>  <div class="forbtn" style="width:390px;">
-    <input name="temp_rule" id="temp_rule" type="checkbox" value="1" class="letbt">
-    <label style="text-align:left;">This rule will be removed after 24 hrs</label>
-    </div>
+    </div>  
 	<div style="clear:both;"></div>
      <div class="btnleft_rule">
      
@@ -256,11 +215,12 @@ return false;
     <table width="100%" border="0" class="imagetable" id="update" >
       <thead>
 	  <tr>
-       <th width="21%" scope="col">Employee</th>
-        <th width="15%" scope="col">Site Code</th>
+       <th width="15%" scope="col">Employee</th>
+        <th width="10%" scope="col">Site Code</th>
         <th width="12%" scope="col">Value From($)</th>
         <th width="12%" scope="col">Value To($)</th>
         <th width="9%" scope="col">Per Month</th>
+		<th width="12%" scope="col">Assigned orders</th>
 		 <th width="10%" scope="col">Level</th>
         <th width="11%" scope="col">Main Repo</th>
         <th width="10%" scope="col">Action</th>
@@ -268,12 +228,13 @@ return false;
 	  </thead>
 	  <tbody>
 	  <?php foreach($rules->result() as $rule) {?>
-      <tr id="rule_<?php echo $rule->rule_id;?>" <?php if($rule->is_temp == 1){echo "style='color:#3399CC;font-weight:bold;'";}?> >
-        <td><?php echo $rule->name;if($rule->is_temp == 1){echo " (Only for 24 hrs)";}?></td>
+      <tr id="rule_<?php echo $rule->rule_id;?>"  >
+        <td><?php echo $rule->name;?></td>
         <td><?php echo $rule->site_code;?></td>
         <td><?php echo $rule->min_order_amount;?></td>
         <td><?php echo $rule->max_order_amount;?></td>
         <td><?php echo $rule->per_month;?></td>
+		<td><?php echo $rule->month_cnt;?></td>
         <td><?php echo $rule->rule_priority;?></td>
 		<td><?php echo $a = $rule->lead_repo?'Yes':'No';?></td>
         <td><a href="#" class="delete"><img src="<?php echo base_url()?>images/gnome_edit_delete.png" width="24" height="24" /></a>&nbsp;&nbsp;<a href="#" class="editbtn"><img src="<?php echo base_url()?>images/list_edit.png" width="20" height="20" /></a></td>

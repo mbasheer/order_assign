@@ -26,8 +26,6 @@ class Cron extends CI_Controller {
 		//else create attendance with full present
 		$is_attendance = $this->attendance->checkAttendance(date('Y-m-d'));
 		if(!$is_attendance){$this->attendance->markDefaultAttendance();}
-		//remove temp rule , if any previous temp rule 
-	    $this->order->deleteTempRule();
 		//assign orders from all sites . one by one 
 		//slecet all site_id and corresponding database from sites table
 		$sites = $this->order->getAllSites();
