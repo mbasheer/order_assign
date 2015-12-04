@@ -63,13 +63,13 @@ class Order_model extends CI_Model {
 		}
 		
 		//check this order created by our staff other than customer assign to that staff 
-		if($createduser != 0)
+		/*if($createduser != 0)
 		{
 		   //if any created user id
 		   //gt that username from user_id
 		   $username = $this->getUsernamefromId($createduser);
 		   if($username){return $username;}
-		}
+		}*/
 		
 		
 		//if this order is a copy/reorder of another order , assigned to same user
