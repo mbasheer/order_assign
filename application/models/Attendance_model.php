@@ -97,4 +97,52 @@ class Attendance_model extends CI_Model {
 		return $sql_sites;
 		
 	}
+	
+	//insert to holiday table and return last insrt id
+	public function addNewHoliday()
+	{
+	   $admin_id     = $this->session->userdata('user_id');
+	   $holiday_date = $_REQUEST['holiday_date'];
+	   $subject      = $_REQUEST['subject'];
+	   $repeat       = $_REQUEST['repeat'];
+	   $sql          = "INSERT INTO `holidays` (`id`, `holiday_date`, `subject`, `nextyear`, `created_by`, `updated_date`) 
+	                    VALUES (NULL, '$holiday_date', '$subject', '$repeat', '$admin_id', NOW())";
+	   $this->opasa->query($sql);	
+	   return $this->opasa->insert_id();				
+	}
+	
+	public function getHolidaybyId($holiday_id)
+	{
+	   $sql  = "select * from holidays where id = '$holiday_id'";
+	   return $this->opasa->query($sql);
+	}
+	
+	public function getHolidayList()
+	{
+	   $sql = "select * from holidays where holiday_date >= CURDATE() order by holiday_date";
+	   return $this->opasa->query($sql);
+	}
+	//delete holiday
+	public function delete_holiday($id)
+	{
+	   $sql  = "delete from holidays where id = '$id'";
+	   $this->opasa->query($sql);
+	}
+	public function updateHoliday($holiday_id)
+	{
+	   $holiday_date = $_REQUEST['holiday_date'];
+	   $subject      = $_REQUEST['subject'];
+	   $sql          = "update holidays set holiday_date = '$holiday_date', subject = '$subject',updated_date=NOW()  where id ='$holiday_id'";
+	   $this->opasa->query($sql);
+	}
+	
+	public function checkHoliday()
+	{
+	   $sql = $this->opasa->query("select * from holidays where holiday_date = CURDATE()");
+	   if($sql->num_rows() > 0)
+	   {
+	     return 1;
+	   }
+	   else return 0;
+	}
 }	

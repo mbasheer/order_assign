@@ -22,6 +22,10 @@ class Cron extends CI_Controller {
 	//it runs in every 10 minutes
 	public function order_assign()
 	{
+		//check today is holiday
+		//if holiday no assign process
+		$is_holiday = $this->attendance->checkHoliday();
+		if($is_holiday){exit();}
 		//check todays attendance is marked
 		//else create attendance with full present
 		$is_attendance = $this->attendance->checkAttendance(date('Y-m-d'));
@@ -117,6 +121,14 @@ class Cron extends CI_Controller {
 		   }
 		}
 	}
+	
+	//cron job for create repaet holidays
+	//run every jan 1
+	public function repeat_holiday()
+	{
+	    //$sql  = "select * from holidays where nextyear =1"
+	}
+	
 	public function servertime()
 	{
 	   echo date('h:i:sa');

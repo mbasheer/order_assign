@@ -93,6 +93,7 @@ class Attendance extends CI_Controller {
 	  $data['employee']     = $this->order->getUsersList();
 	  $data['sites']        = $this->order->getSiteList();
 	  $data['rules']        = $this->order->getRuleList();
+	  $data['holidays']     = $this->attendance->getHolidayList();
 	  $this->load->view('attendance_mark',$data);
 	}
 	//login view
@@ -165,6 +166,57 @@ class Attendance extends CI_Controller {
 		 }
 		 echo $msg;
 	   }
+	}
+	
+	//add new holiday
+	public function mark_holiday()
+	{
+	    $holiday_id = $this->attendance->addNewHoliday();
+		//if successfully insert the holiday
+		//create html 
+		if($holiday_id)
+		{
+		    $rule_result  = $this->attendance->getHolidaybyId($holiday_id);
+			$data['holiday']  = $rule_result->row();
+			//new rule row view
+			$this->load->view('new_holiday_row',$data);
+		}
+	}
+	
+	//function delete holiday
+	public function delete_holiday()
+	{
+	    if(isset($_GET['delete'])) 
+		{
+		   $holiday_id = $_GET['delete'];
+		   $this->attendance->delete_holiday($holiday_id);
+		}
+	}
+	
+	//get edit form by holiday id
+	public function get_edit_form()
+	{
+	    if(isset($_REQUEST['holiday_id'])) 
+		{
+		   $holiday_id = $_REQUEST['holiday_id'];
+		   $holiday_result       = $this->attendance->getHolidaybyId($holiday_id);
+		   $data['holiday']      = $holiday_result->row();
+		   $this->load->view('edit_holiday_form',$data);
+		}
+	}
+	
+	//edit holiday form
+	function edit_holiday()
+	{
+	    //update holiday
+		$holiday_id  = $_REQUEST['holiday_id'];
+		$this->attendance->updateHoliday($holiday_id);
+		//create revised html with new changes 
+		$holiday_result  = $this->attendance->getHolidaybyId($holiday_id);
+		$data['holiday']  = $holiday_result->row();
+		//new rule row view
+		$this->load->view('updated_holiday_row',$data);
+		
 	}
 
 }
