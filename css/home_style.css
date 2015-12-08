@@ -232,6 +232,7 @@ form > div > label,legend{text-align:right}
     padding: 32px 0 0 10px;;
     text-align: left;color:#FF0000;}
 	.btnleft_rule{margin:5px 0 0 25px;}
+	.btnleft_rule_holiday{margin:5px 0 0 0px;}
 table.holidaytable{font-size:13px;color:#333;border-width:1px;border-color:#999;border-collapse:collapse;margin-top:2%;}
 table.holidaytable td{background:#F4F4F4;border-width:1px;padding:8px;border-style:solid;border-color:#CDCDCD}
 .holidayform input{width:80px;} 

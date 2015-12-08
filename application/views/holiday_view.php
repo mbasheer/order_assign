@@ -22,7 +22,7 @@ $("#addholiday").click(function() {
 	}
 	else if(subject=='')
 	{
-	 alert("Subject is empty");
+	 alert("Please Enter Name");
 	}
 	else
 	{
@@ -106,9 +106,9 @@ return false;
 	<div class="holidayform"> <form id="frmholiday"><label>Date :</label>
 	
         <input name="datepicker" type="text" id="datepicker"> 
-		<label>Subject :</label>
+		<label>Name :</label>
         <input name="subject" id="subject" type="text" class="holiday_subj"> <input id="repeat" type="checkbox" value="" class="letbt"> Repeat in next year 
-		 <div class="btnleft_rule"><input class="saveForm"  type="submit" value="Add" id="addholiday"></div>
+		 <div class="btnleft_rule_holiday"><input class="saveForm"  type="submit" value="Add" id="addholiday"></div>
 		 </form>
 		 </div>
     
