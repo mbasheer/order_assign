@@ -107,6 +107,7 @@ return false;
   <li class="current"><a href="#tab-1">Attendance</a></li>
   <?php if($this->session->userdata('user_type') == 1){?>
   <li><a href="#tab-2">Assign Rules</a></li>
+   <li><a href="#tab-3">Holidays</a></li>
   <?php }?>
 </ul>
 <div class="tab">
@@ -145,11 +146,17 @@ return false;
     <div class="tablen">
 	 <div style="color:red;"><?php echo $msg;?></div>
       <div class="btnleft">
-        <?php if($restrict!=1){?><input id="saveForm"  name="save" type="submit" value="Save" onClick="submtfrm();"></form>
+        <?php if($restrict!=1){?><input class="saveForm"  name="save" type="submit" value="Save" onClick="submtfrm();"></form>
 		<?php } else echo '<span style="color:red">Attendance marking allowed only till 9 AM, please contact administrator</span>';?>
       </div>
     </div>
   </div>
+  
+  <!--holidays-->
+  <div id="tab-3" class="tab-content">
+  <?php $this->load->view('holiday_view');?>
+  </div>
+  <!---->
   <div id="tab-2" class="tab-content">
     <div class="main-header selw">
       <div class="left-widthr"><b>Order Assign Rule</b></div>
@@ -205,7 +212,7 @@ return false;
      <div class="btnleft_rule">
      
        
-          <input id="saveForm"  type="submit" value="Add Rule" class="subf">
+          <input   type="submit" value="Add Rule" class="subf saveForm">
       
       </div>
     </form>
@@ -246,6 +253,7 @@ return false;
 	
   </div>
   <br clear="all" />
+  </div>
 </div>
 </body>
 </html>

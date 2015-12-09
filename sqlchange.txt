@@ -1,1 +1,16 @@
 ALTER TABLE `order_assign_rule` ADD `is_temp` INT NULL DEFAULT '0' ;
+
+
+CREATE TABLE IF NOT EXISTS `holidays`
+ (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `holiday_date` date NOT NULL,
+  
+`subject` varchar(100) NOT NULL,
+  `nextyear` int(11) NOT NULL COMMENT 'next year too',
+  `created_by` int(11) 
+NOT NULL,
+  `updated_date` datetime NOT NULL,
+  PRIMARY KEY (`id`)
+) 
+ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
