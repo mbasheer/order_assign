@@ -487,9 +487,6 @@ class Order_model extends CI_Model {
 	
 	
 	//return diff order with changed username
-	//first create a temporary table , values of all order assigned details from opasa db 
-	//then get all orders from website 
-	//compare both table and return all orders of mismatched assigned username 
 	public function getAllReAssignOrder($site_code,$site_id)
 	{
 	    $CI = &get_instance();
@@ -561,6 +558,26 @@ class Order_model extends CI_Model {
 				           VALUES (NULL, '$username', '$site_id', '$order_id', '$dateadded')";
 		   $this->opasa->query($sql);	
 		}
+	}
+	
+	//get latest test/trash orders 
+	public function getAllTestOrders($site_code,$site_id)
+	{
+	    $CI = &get_instance();
+		$this->site_db = $CI->load->database($site_code, TRUE);
+		//get order_ids
+		//avoid old orders
+		//select order only from 3 day time frame
+		$query_test_orders   = "select a.order_id from `order` a  
+		                        where (a.date_added > DATE_SUB(NOW(), INTERVAL 3 DAY) or a.date_modified > DATE_SUB(NOW(), INTERVAL 3 Day)) 
+								and a.order_status_id in(".EXCEPT_STATUS.")";
+		return $this->site_db->query($query_test_orders); 
+	}
+	
+	public function deleteOrderAssign($order_id,$site_id)
+	{
+	    $sql = "delete from assign_orders where order_id = '$order_id' and site_id = '$site_id'";
+		$this->opasa->query($sql);
 	}
 	
 }
