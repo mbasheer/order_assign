@@ -538,7 +538,7 @@ class Order_model extends CI_Model {
 	    $CI = &get_instance();
 		$this->site_db = $CI->load->database($site_code, TRUE);
 		
-		$sql_assignedOrders = $this->site_db->query("SELECT a.order_id, a.date_added, b.username FROM `order` a JOIN user b ON a.customer_assign = b.user_id WHERE a.customer_assign <>0 AND (a.date_added > DATE_SUB( NOW( ) , INTERVAL 10 DAY ))");
+		$sql_assignedOrders = $this->site_db->query("SELECT a.order_id, a.date_added, b.username FROM `order` a JOIN user b ON a.customer_assign = b.user_id WHERE a.customer_assign <>0 AND (a.date_added > DATE_SUB( NOW( ) , INTERVAL 4 DAY )) and a.order_status_id not in(2,45,47)");
 		return $sql_assignedOrders;
 	}
 	
