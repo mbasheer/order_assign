@@ -99,6 +99,24 @@ class Cron extends CI_Controller {
 			    $this->order->changeReorderUser($order_id, $user_name, $site_id);
 		   }
 		}
+		
+		//remove test/trash order from order assign table. 
+		//at the time of automated assign these ordrs are not in test/trash
+		 //get all active sites for syncing
+		$sites = $this->order->getAllSites();
+		foreach($sites->result() as $site)
+		{
+		   $site_id   = $site->site_id;
+		   $site_code = $site->site_code;
+		   //get reassigned orders of this site 
+		   $new_test_orders = $this->order->getAllTestOrders($site_code,$site_id);
+		   foreach($new_test_orders->result() as $test_order)
+		   {
+		        $order_id = $test_order->order_id;
+			   //delete order from order assign table
+			    $this->order->deleteOrderAssign($order_id,$site_id);
+		   }
+		}
 	}
 	
 	//sync full assign orders to opas table , last month orders
