@@ -36,11 +36,18 @@ class Order_model extends CI_Model {
 		//avoid old orders
 		//select only from one week time frame
 		
-		//this ithe correct sql, commented only for testing 
 		$sql  = "SELECT `order_id`,`date_added`, total, createduser_id, email FROM `order` 
 		         WHERE (`customer_assign` = 0 or customer_assign IS NULL) AND (date_added > DATE_SUB(NOW(), INTERVAL 1 WEEK) or date_modified > DATE_SUB(NOW(), INTERVAL 1 WEEK)) 
-				 AND order_status_id not in(2,45,47)
+				 AND order_status_id not in(".EXCEPT_STATUS.") 
 				 order by date_added";	
+		if($site_code == 'BKC')
+		{
+		   //include processing order too
+		  $sql  = "SELECT `order_id`,`date_added`, total, createduser_id, email FROM `order` 
+		         WHERE (`customer_assign` = 0 or customer_assign IS NULL) AND (date_added > DATE_SUB(NOW(), INTERVAL 1 WEEK) or date_modified > DATE_SUB(NOW(), INTERVAL 1 WEEK)) 
+				 AND order_status_id not in(45,47) 
+				 order by date_added"; 
+		}		 
 		/*$sql  = "SELECT `order_id`,`date_added`, total FROM `order` 
 		         WHERE (`customer_assign` = 0 or customer_assign IS NULL)
 				 order by date_added desc limit 2";	 */
@@ -292,7 +299,7 @@ class Order_model extends CI_Model {
 			 $user_id     = $row_user_id->user_id;
 			 //update order table 
 			 //customer_assign column in order table
-			 $query_order_update = "update `order` set customer_assign = $user_id where order_id = '$order_id'";
+			 $query_order_update = "update `order` set customer_assign = $user_id, date_modified = now()  where order_id = '$order_id'";
 			 
 			 if($this->site_db->query($query_order_update))
 			 {
@@ -366,7 +373,7 @@ class Order_model extends CI_Model {
 	{
 	   //select prevoius order from this email id , assigned <> 0 
 	   $query_reorder   = "SELECT a.username  FROM `user` a join `order` b on a.user_id = b.`customer_assign` 
-	                       WHERE b.`customer_assign` <> 0 and b.`email` = '$email' and b.`order_id` <> '$order_id' and b.order_status_id not in(2,47,45) order by b.`date_modified` desc limit 1";
+	                       WHERE b.`customer_assign` <> 0 and b.`email` = '$email' and b.`order_id` <> '$order_id' and b.order_status_id not in(".EXCEPT_STATUS.") order by b.`date_modified` desc limit 1";
 	   $sql_reorder     = $this->site_db->query($query_reorder);
 	   if($sql_reorder->num_rows()<1)
 	   {
@@ -495,7 +502,7 @@ class Order_model extends CI_Model {
 		//avoid old orders
 		//select order only from one week time frame
 		$query_assigned_site = "select a.order_id,b.username from `order` a join user b on a.customer_assign = b.user_id 
-		                        where (a.date_added > DATE_SUB(NOW(), INTERVAL 5 DAY) or a.date_modified > DATE_SUB(NOW(), INTERVAL 5 Day)) and a.order_status_id not in(2,45,47)";
+		                        where (a.date_added > DATE_SUB(NOW(), INTERVAL 5 DAY) or a.date_modified > DATE_SUB(NOW(), INTERVAL 5 Day)) and a.order_status_id not in(".EXCEPT_STATUS.")";
 		$sql_assigned_site   = $this->site_db->query($query_assigned_site); 
 		//add this result to array for comparison
 		$site_order_array = array(); 
@@ -538,7 +545,7 @@ class Order_model extends CI_Model {
 	    $CI = &get_instance();
 		$this->site_db = $CI->load->database($site_code, TRUE);
 		
-		$sql_assignedOrders = $this->site_db->query("SELECT a.order_id, a.date_added, b.username FROM `order` a JOIN user b ON a.customer_assign = b.user_id WHERE a.customer_assign <>0 AND (a.date_added > DATE_SUB( NOW( ) , INTERVAL 4 DAY )) and a.order_status_id not in(2,45,47)");
+		$sql_assignedOrders = $this->site_db->query("SELECT a.order_id, a.date_added, b.username FROM `order` a JOIN user b ON a.customer_assign = b.user_id WHERE a.customer_assign <>0 AND (a.date_added > DATE_SUB( NOW( ) , INTERVAL 4 DAY )) and a.order_status_id not in(".EXCEPT_STATUS.")");
 		return $sql_assignedOrders;
 	}
 	
@@ -570,7 +577,7 @@ class Order_model extends CI_Model {
 		//select order only from 3 day time frame
 		$query_test_orders   = "select a.order_id from `order` a  
 		                        where (a.date_added > DATE_SUB(NOW(), INTERVAL 3 DAY) or a.date_modified > DATE_SUB(NOW(), INTERVAL 3 Day)) 
-								and a.order_status_id in(".EXCEPT_STATUS.")";
+								and a.order_status_id in(45,47)";
 		return $this->site_db->query($query_test_orders); 
 	}
 	
