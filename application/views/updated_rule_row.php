@@ -28,12 +28,15 @@
 			     parent.css('background-color', '#fb6c6c'); //change background color
 				//parent.animate({'backgroundColor':'#fb6c6c'},300);
 			},
-			success: function() {
-				   //parent.slideUp(300,function() {
-				  // parent.remove();
-				  parent.find('td').fadeOut(1000,function(){ 
-                  parent.remove();
-				});
+			success: function(msg) {
+				 if(msg == 1)
+				 { 
+				   parent.find('td').fadeOut(1000,function(){ parent.remove(); });
+				 } 
+				 else
+				 {
+				    alert("Only one assigning person for this product , please add another person to remove this rule");
+				 }
 			}//success end
 		});
 		

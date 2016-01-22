@@ -37,7 +37,18 @@ class Order_rule extends CI_Controller {
 	    if(isset($_GET['delete'])) 
 		{
 		   $rule_id = $_GET['delete'];
-		   $this->order->delete_rule($rule_id);
+		   //check this rule is unique for that product , if yes dont allow to remove this rule
+		   $count_rule = $this->order->countRulesBySite($rule_id);
+		   if($count_rule == 1)
+		   {
+		      //return error message
+			  echo 0;
+		   }
+		   else
+		   {
+		     $this->order->delete_rule($rule_id);
+			 echo 1;
+		   }	 
 		}
 	}
 	
