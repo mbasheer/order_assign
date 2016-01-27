@@ -587,4 +587,13 @@ class Order_model extends CI_Model {
 		$this->opasa->query($sql);
 	}
 	
+	//get count of rule of site using ruleid
+	public function countRulesBySite($rule_id)
+	{
+	   $query = "SELECT count(*) as cnt FROM `order_assign_rule` WHERE `site_id` = (select `site_id` from order_assign_rule where `rule_id` ='$rule_id')";
+	   $sql   = $this->opasa->query($query);
+	   $row   = $sql->row();
+	   return $row->cnt;
+	}
+	
 }

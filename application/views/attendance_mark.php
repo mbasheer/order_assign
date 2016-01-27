@@ -216,9 +216,9 @@ return false;
       
       </div>
     </form>
-	<div id="inform" align="left" style="color:#993300; display:none;">New Rule Created Successfully</div>
 	<div id="flash" align="left"  ></div>
 	<div class="runrule" id="runrule"><a href="#" id="run_rule" title="Run Rule" alt="Run Rule">Run Rule Now</a></div><div class="runrule" id="running"></div>
+     <div id="inform" align="left" style="color:#FF0000;"></div>
     <table width="100%" border="0" class="imagetable" id="update" >
       <thead>
 	  <tr>
