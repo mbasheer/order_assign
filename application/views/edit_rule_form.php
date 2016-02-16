@@ -9,8 +9,10 @@
 		<?php }?>
 		</select>
 		</td>
+         <?php if(@$rule_type!=3) {?>
         <td><input type="text" id="value_from_edit_<?php echo $rule_id;?>"  value="<?php echo $rule->min_order_amount;?>" /></td>
         <td><input type="text" id="value_to_edit_<?php echo $rule_id;?>"  value="<?php echo $rule->max_order_amount;?>" /></td>
+        <?php }?>
         <td><input type="text" id="per_month_edit_<?php echo $rule_id;?>"  value="<?php echo $rule->per_month;?>" /></td>
 		 <td><?php echo $rule->month_cnt;?></td>
         <td>
@@ -51,8 +53,12 @@
 		
 		var username = $("#user_edit_"+rul_id).val();
 	    var site_id = $("#site_edit_"+rul_id).val();
-	    var value_from = $("#value_from_edit_"+rul_id).val();
-	    var value_to = $("#value_to_edit_"+rul_id).val();
+		var value_from=0;
+		var value_to =0;
+		 <?php if(@$rule_type!=3) {?>
+	    value_from = $("#value_from_edit_"+rul_id).val();
+	    value_to = $("#value_to_edit_"+rul_id).val();
+		<?php }?>
 	    var per_month = $("#per_month_edit_"+rul_id).val();
 	    var level   = $("#levels_edit_"+rul_id).val();
 	    var lead_repo = $("#lead_repo_edit_"+rul_id).val();

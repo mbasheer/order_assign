@@ -1,7 +1,9 @@
         <td style="background-color:#00CC33;"><?php echo $rule->name;?></td>
         <td style="background-color:#00CC33;"><?php echo $rule->site_code;?></td>
+         <?php if(@$rule_type!=3) {?>
         <td style="background-color:#00CC33;"><?php echo $rule->min_order_amount;?></td>
         <td style="background-color:#00CC33;"><?php echo $rule->max_order_amount;?></td>
+        <?php }?>
         <td style="background-color:#00CC33;"><?php echo $rule->per_month;?></td>
 		<td style="background-color:#00CC33;"><?php echo $rule->month_cnt;?></td>
         <td style="background-color:#00CC33;"><?php echo $rule->rule_priority;?></td>

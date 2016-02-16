@@ -79,8 +79,16 @@ return false;
 		   $('#run_rule').hide();
 			},
         success: function(){
-		                    $('#running').hide(); 
-							$('#run_rule').show();
+		                   //free sample assign
+							$.ajax({
+							url: "<?php echo base_url()?>index.php/cron/freesample_assign",
+							cache: false,
+							success: function(){
+									$('#running').hide(); 
+								    $('#run_rule').show();
+										   }
+							   });
+							//end free sample
                        }
            });
 	  
@@ -112,7 +120,16 @@ function display_rules(type)
     
         $('#filter_user').val("0");
         $('#filter_product').val("0");
-
+		if(type==3)
+		{
+           $('#valuefrm_div').hide();
+		   $('#valueto_div').hide();
+		}
+		else
+		{
+		   $('#valuefrm_div').show();
+		   $('#valueto_div').show();
+		}
 		$.ajax({
         url: "<?php echo base_url()?>index.php/order_rule/getRulesByType/"+type,
         cache: false,
@@ -196,10 +213,11 @@ function display_rules(type)
   <!---->
   <div id="tab-2" class="tab-content">
     <div class="main-header selw">
+     <div class="left-widthr"><b>Order Assign Rule</b></div>
+      <br clear="all">
      <div class="leftform"> <label>Rule Type: </label> <select id="rule_type" onChange="display_rules(this.value)"><option value="1">General Assign Rule</option><option value="2">Processing Assign Rule</option><option value="3">Free Sample Assign Rule</option></select> </div>
      <br clear="all">
-      <div class="left-widthr"><b>Order Assign Rule</b></div>
-      <br clear="all">
+     
       <div class="leftform">
 	  <form name="rulfrm" id="myForm" action="#" method="post">
         <label>Employee: </label>
@@ -219,11 +237,11 @@ function display_rules(type)
 		   <?php }?> 
         </select>
       </div>
-      <div class="leftform">
+      <div class="leftform" id="valuefrm_div">
         <label>Order value From: </label>
         <input id="value_from" type="number">
       </div>
-      <div class="leftform">
+      <div class="leftform" id="valueto_div">
         <label>To: </label>
         <input id="value_to" type="number">
       </div>
@@ -263,7 +281,7 @@ function display_rules(type)
 		   <?php }?>   </select>
            &nbsp;<select id="filter_product" style="width:120px;"><option value="0">All Products</option>
            <?php foreach($sites->result() as $site){?>
-		   <option value="<?php echo $site->site_id;?>"><?php echo $site->site_name;?></option>
+		   <option value="<?php echo $site->site_id;?>"><?php echo $site->site_code;?></option>
 		   <?php }?> 
            </select>&nbsp;<div class="filter" ><a href="#" id="filter_row">Filter</a></div></div>
 	<div class="runrule" id="runrule"><a href="#" id="run_rule" title="Run Rule" alt="Run Rule">Run Rule Now</a></div><div class="runrule" id="running"></div>

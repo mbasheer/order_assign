@@ -26,6 +26,7 @@ class Order_rule extends CI_Controller {
 		{
 		    $rule_result  = $this->order->getRulebyId($rule_id);
 			$data['rule']  = $rule_result->row();
+			$data['rule_type']    = $data['rule']->rule_type;
 			//new rule row view
 			$this->load->view('new_rule_row',$data);
 		}
@@ -62,6 +63,7 @@ class Order_rule extends CI_Controller {
 	       $data['sites']        = $this->order->getSiteList();
 		   $rule_result          = $this->order->getRulebyId($rule_id);
 		   $data['rule']         = $rule_result->row();
+		   $data['rule_type']    = $data['rule']->rule_type;
 		   $this->load->view('edit_rule_form',$data);
 		   
 		}
@@ -76,6 +78,7 @@ class Order_rule extends CI_Controller {
 		//create revised html with new changes 
 		$rule_result  = $this->order->getRulebyId($rule_id);
 		$data['rule']  = $rule_result->row();
+		$data['rule_type']    = $data['rule']->rule_type;
 		//new rule row view
 		$this->load->view('updated_rule_row',$data);
 		
@@ -85,6 +88,7 @@ class Order_rule extends CI_Controller {
 	public function getRulesByType($type)
 	{
 	   $data['rules']  = $this->order->getRuleList($type);
+	   $data['rule_type'] = $type;
 	   $this->load->view('rules_list_view',$data);
 	}
 	

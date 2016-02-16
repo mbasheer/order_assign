@@ -23,7 +23,7 @@ class Freesample_model extends CI_Model {
 	    $CI = &get_instance();
 		$this->site_db = $CI->load->database($site_code, TRUE);
 	    $sql = "SELECT `free_sample_id`,`product_id` FROM `sample_request_orders` WHERE 
-		       (`assigned_to`=0 or `assigned_to` IS NULL) and `date_added` > DATE_SUB(NOW(), INTERVAL 10 DAY)";
+		       (`assigned_to`=0 or `assigned_to` IS NULL) and `date_added` > DATE_SUB(NOW(), INTERVAL 4 DAY)";
 		return $this->site_db->query($sql);
 	}
 	

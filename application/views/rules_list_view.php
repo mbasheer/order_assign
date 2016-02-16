@@ -3,8 +3,10 @@
 	  <tr>
        <th width="15%" scope="col">Employee</th>
         <th width="10%" scope="col">Site Code</th>
+        <?php if(@$rule_type!=3) {?>
         <th width="12%" scope="col">Value From($)</th>
         <th width="12%" scope="col">Value To($)</th>
+        <?php }?>
         <th width="9%" scope="col">Per Month</th>
 		<th width="12%" scope="col">Assigned orders</th>
 		 <th width="10%" scope="col">Level</th>
@@ -17,8 +19,10 @@
       <tr id="rule_<?php echo $rule->rule_id;?>"  >
         <td><?php echo $rule->name;?></td>
         <td><?php echo $rule->site_code;?></td>
+         <?php if(@$rule_type!=3) {?>
         <td><?php echo $rule->min_order_amount;?></td>
         <td><?php echo $rule->max_order_amount;?></td>
+        <?php }?>
         <td><?php echo $rule->per_month;?></td>
 		<td><?php echo $rule->month_cnt;?></td>
         <td><?php echo $rule->rule_priority;?></td>
