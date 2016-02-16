@@ -211,6 +211,7 @@ input[type=text],input[type=email],input[type=url],input[type=password],textarea
 @media (min-width: 1200px) {
 form > div > label,legend{text-align:right}
 }
+.filderdiv{float:left;width:600px;}
 .runrule{ float: right;
     padding: 0 0px 10px 0;
     color: #e0162b;
@@ -237,3 +238,20 @@ table.holidaytable{font-size:13px;color:#333;border-width:1px;border-color:#999;
 table.holidaytable td{background:#F4F4F4;border-width:1px;padding:8px;border-style:solid;border-color:#CDCDCD}
 .holidayform input{width:80px;} 
 .holiday_subj{width:180px !important;}	
+.filter{float:left;
+    padding: 0 0px 10px 0;
+    color: #e0162b;
+    font-size: 12px;
+	margin-left:9px;}
+.filter a{color: #e0162b; /
+    font-size: 12px;
+    text-decoration: none;
+    background: #3cb0fd;
+    background-image: -webkit-linear-gradient(top,#3cb0fd,#3498db);
+    background-image: -moz-linear-gradient(top,#3cb0fd,#3498db);
+    background-image: -ms-linear-gradient(top,#3cb0fd,#3498db);
+    background-image: -o-linear-gradient(top,#3cb0fd,#3498db);
+    background-image: linear-gradient(to bottom,#3cb0fd,#3498db);
+    text-decoration: none;
+    padding: 5px;
+    color: white;}

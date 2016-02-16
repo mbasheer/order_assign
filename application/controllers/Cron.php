@@ -48,13 +48,26 @@ class Cron extends CI_Controller {
 			 //createduser_id = order ceated by staff or customer 
 			 $createduser  = $order->createduser_id;
 			 $cust_email   = $order->email;
+			 $order_status = $order->order_status_id;
+			 //processing order(id-2) assign only after 30 mnts from order placed
+			 //else skip that order
+			 if($order_status==2)
+			 {
+			   	//check time differnce more than 30 minuts 
+				//else skip this processing order form auto asisgn rule
+				$time_diffrence = $order->time_dif;
+				if($time_diffrence < 30)
+				{
+				  continue;
+				}
+			 }
 			 //get best users using assign rule
-			  $assign_user  = $this->order->orderAssignUser($site_id,$order_id, $cust_email, $order_price,$site_code, $createduser);
+			  $assign_user  = $this->order->orderAssignUser($site_id,$order_id, $cust_email, $order_price,$site_code, $createduser, $order_status);
 			 //asign order to user if get assigned user
 			 if($assign_user)
 			 {
 			    $assign_user = strtolower($assign_user);
-				$this->order->orderAssign($site_id,$order_id,$site_code,$assign_user);
+				$this->order->orderAssign($site_id, $order_id, $site_code, $assign_user, $order_status);
 			 } 
 			 //send email alert to admin while no user for any order
 			 else
@@ -123,7 +136,7 @@ class Cron extends CI_Controller {
 	public function syncing()
 	{
 	    //$sites = $this->opasa->query("select site_id,site_code from sites where site_id =1");
-		$sites = $this->order->selectAllSites();
+		$sites = $this->order->getAllSites();
 		foreach($sites->result() as $site)
 		{
 		   $site_id     = $site->site_id;
@@ -132,10 +145,27 @@ class Cron extends CI_Controller {
 		   //check one by one, these order is in assign_orders table
 		   foreach($all_orders->result() as $orders)
 		   {
-		      $order_id  = $orders->order_id;
-			  $username  = $orders->username;
-			  $dateadded = $orders->date_added;
-			  $this->order->syncOrder($site_id,$order_id,$username,$dateadded);
+		      $order_id     = $orders->order_id;
+			  $username     = $orders->username;
+			  $dateadded    = $orders->date_added;
+			  $order_status = $orders->order_status_id;
+			  $this->order->syncOrder($site_id,$order_id,$username,$dateadded,$order_status);
+		   }
+		}
+		
+		//remove deleted procesisng order from directpr databse
+		$sites = $this->order->getAllSites();
+		foreach($sites->result() as $site)
+		{
+		   $site_id     = $site->site_id;
+		   $site_code   = $site->site_code;
+		   $proc_orders  = $this->order->get_daily_processing_order($site_id);
+		   //check one by one, these order still exist in sites
+		   foreach($proc_orders->result() as $proc_order)
+		   {
+		      $order_id     = $proc_order->order_id;
+			  //check order is exist , else remove from table
+			  $this->order->check_exist_in_site($site_code,$order_id,$site_id);
 		   }
 		}
 	}
@@ -150,5 +180,44 @@ class Cron extends CI_Controller {
 	public function servertime()
 	{
 	   echo date('h:i:sa');
+	}
+	
+	//cron job for assign free sample orders
+	public function freesample_assign()
+	{
+	   $this->load->model('freesample_model','sample'); 
+	   //check today is holiday
+		//if holiday no assign process
+		$is_holiday = $this->attendance->checkHoliday();
+		if($is_holiday){exit();}
+		//check todays attendance is marked
+		//else create attendance with full present
+		$is_attendance = $this->attendance->checkAttendance(date('Y-m-d'));
+		if(!$is_attendance){$this->attendance->markDefaultAttendance();}
+		//assign orders from all sites . one by one 
+		//slecet all  site_id which have fee sample option; and corresponding database from sites table
+		$sites = $this->sample->getFreeSampleSites();
+		foreach($sites->result() as $site)
+		{
+		  $site_name = $site->site_name;
+		  $site_id   = $site->site_id;
+		  $site_code = $site->site_code;
+		  //fetch all not assigned free sampleorders from site
+		  $samples    = $this->sample->getAllNotAssignFreeSamples($site_code);
+		  foreach($samples->result() as $sample)
+		  {
+		     $sample_id    = $sample->free_sample_id;
+			 $product_id   = $sample->product_id;
+			 //get best users using assign rule
+			 $assign_user  = $this->sample->sample_order_assign_user($site_id,$sample_id);
+			 //asign order to user if get assigned user
+			 if($assign_user)
+			 {
+			    $assign_user = strtolower($assign_user);
+				$this->sample->sample_order_assign($site_id, $sample_id, $product_id, $assign_user);
+			 } 
+			 
+		  }//end orders
+		}//end sites
 	}
 }

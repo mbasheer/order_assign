@@ -92,7 +92,7 @@ class Attendance extends CI_Controller {
 	  //data for assign rule tab
 	  $data['employee']     = $this->order->getUsersList();
 	  $data['sites']        = $this->order->getSiteList();
-	  $data['rules']        = $this->order->getRuleList();
+	  $data['rules']        = $this->order->getRuleList(1);
 	  $data['holidays']     = $this->attendance->getHolidayList();
 	  $this->load->view('attendance_mark',$data);
 	}

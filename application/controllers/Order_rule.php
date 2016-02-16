@@ -80,4 +80,18 @@ class Order_rule extends CI_Controller {
 		$this->load->view('updated_rule_row',$data);
 		
 	}
+	
+	//get rules by rule type
+	public function getRulesByType($type)
+	{
+	   $data['rules']  = $this->order->getRuleList($type);
+	   $this->load->view('rules_list_view',$data);
+	}
+	
+	//filter rules
+	public function filter_rules()
+	{
+	    $data['rules'] = $this->order->get_filter_rules();
+		$this->load->view('rules_list_view',$data);
+	}
 }	

@@ -1,18 +1,45 @@
-ALTER TABLE `order_assign_rule` ADD `is_temp` INT NULL DEFAULT '0' ;
+ALTER TABLE `order_assign_rule` ADD `rule_type` INT NULL DEFAULT '1' COMMENT '1:normal 2:proc.rule 3:freesample rule' ;
+ALTER TABLE `assign_orders` ADD `assigned_status` INT NULL , ADD `current_status` INT NULL ;
+ALTER TABLE `sites` ADD `sample_status` INT NULL DEFAULT '0' COMMENT '1:free sample order auto assign' AFTER `status`;
+
+-- phpMyAdmin SQL Dump
+-- version 4.1.14
+-- http://www.phpmyadmin.net
+--
+-- Host: 127.0.0.1
+-- Generation Time: Feb 11, 2016 at 10:49 AM
+-- Server version: 5.6.17
+-- PHP Version: 5.5.12
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET time_zone = "+00:00";
 
 
-CREATE TABLE IF NOT EXISTS `holidays`
- (
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8 */;
+
+--
+-- Database: `opasa`
+--
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `sample_assign_orders`
+--
+
+CREATE TABLE IF NOT EXISTS `sample_assign_orders` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `holiday_date` date NOT NULL,
-  
-`subject` varchar(100) NOT NULL,
-  `nextyear` int(11) NOT NULL COMMENT 'next year too',
-  `created_by` int(11) 
-NOT NULL,
-  `updated_date` datetime NOT NULL,
+  `sample_id` varchar(20) NOT NULL,
+  `product_id` varchar(20) NOT NULL,
+  `site_id` int(11) NOT NULL,
+  `username` int(11) NOT NULL,
+  `assign_date` datetime NOT NULL,
   PRIMARY KEY (`id`)
-) 
-ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
-add constant in config/constant.php
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
