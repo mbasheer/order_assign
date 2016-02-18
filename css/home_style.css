@@ -242,8 +242,9 @@ table.holidaytable td{background:#F4F4F4;border-width:1px;padding:8px;border-sty
     padding: 0 0px 10px 0;
     color: #e0162b;
     font-size: 12px;
-	margin-left:9px;}
-.filter a{color: #e0162b; /
+	margin-left:9px;
+	}
+.filter a{color: #e0162b; display: block;
     font-size: 12px;
     text-decoration: none;
     background: #3cb0fd;
@@ -253,5 +254,5 @@ table.holidaytable td{background:#F4F4F4;border-width:1px;padding:8px;border-sty
     background-image: -o-linear-gradient(top,#3cb0fd,#3498db);
     background-image: linear-gradient(to bottom,#3cb0fd,#3498db);
     text-decoration: none;
-    padding: 5px;
+    padding: 3px 5px;
     color: white;}
