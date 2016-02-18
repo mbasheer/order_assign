@@ -2,6 +2,7 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 class Order_model extends CI_Model {
 	public $site_db;
+	public $rule_type;
 	public function __construct()
     {
          parent::__construct();
@@ -36,29 +37,28 @@ class Order_model extends CI_Model {
 		//avoid old orders
 		//select only from one week time frame
 		
-		$sql  = "SELECT `order_id`,`date_added`, total, createduser_id, email FROM `order` 
+		$sql  = "SELECT TIMESTAMPDIFF(MINUTE,date_added,NOW()) as time_dif,`order_id`,`date_added`, total, createduser_id, email, order_status_id FROM `order` 
 		         WHERE (`customer_assign` = 0 or customer_assign IS NULL) AND (date_added > DATE_SUB(NOW(), INTERVAL 1 WEEK) or date_modified > DATE_SUB(NOW(), INTERVAL 1 WEEK)) 
 				 AND order_status_id not in(".EXCEPT_STATUS.") 
 				 order by date_added";	
-		if($site_code == 'BKC')
-		{
-		   //include processing order too
-		  $sql  = "SELECT `order_id`,`date_added`, total, createduser_id, email FROM `order` 
-		         WHERE (`customer_assign` = 0 or customer_assign IS NULL) AND (date_added > DATE_SUB(NOW(), INTERVAL 1 WEEK) or date_modified > DATE_SUB(NOW(), INTERVAL 1 WEEK)) 
-				 AND order_status_id not in(45,47) 
-				 order by date_added"; 
-		}		 
-		/*$sql  = "SELECT `order_id`,`date_added`, total FROM `order` 
-		         WHERE (`customer_assign` = 0 or customer_assign IS NULL)
-				 order by date_added desc limit 2";	 */
+		
 		return $this->site_db->query($sql); 
 	}
 	
 	//return assigned username
 	//input - site id , order id, email, created user_id (o- craeted by customer itself), and price
-	public function orderAssignUser($site_id,$order_id,$cust_email, $order_price,$site_code,$createduser)
+	public function orderAssignUser($site_id,$order_id,$cust_email, $order_price,$site_code,$createduser, $order_status)
 	{
-	    $assigned_user = 0;
+	    //if processing orders rule_type is 2 else 1
+		if($order_status == 2)
+		{
+		   $this->rule_type = 2;
+		}
+		else
+		{
+		   $this->rule_type = 1;
+		}
+		$assigned_user = 0;
 		//if order is blank that order directly assigned to blank user with our any further checking
 		//call checkorderisblank function for checking this orsder is balnk or not
 		//return 1 is blank otherwise return 0
@@ -82,17 +82,21 @@ class Order_model extends CI_Model {
 		//if this order is a copy/reorder of another order , assigned to same user
 		//return previous order asisgne drepo name 
 		//else return 0
-		$reorder_repo     = $this->checkReOrder($order_id, $cust_email);
-		if($reorder_repo)
+		//reorder checking except processing orders
+		if($order_status != 2)
 		{
-		   //check check this user still in that site's rule list
-		   //otherwise this order act as a normal order 
-		   $present_status_sql = $this->opasa->query("select rule_id from order_assign_rule where username = '$reorder_repo' and site_id = $site_id");
-           //if username 
-		   if($present_status_sql->num_rows() >  0)	
-		   {												  
-			   return $reorder_repo; //parent order assigned username
-		   }	 
+			$reorder_repo     = $this->checkReOrder($order_id, $cust_email);
+			if($reorder_repo)
+			{
+			   //check check this user still in that site's rule list
+			   //otherwise this order act as a normal order 
+			   $present_status_sql = $this->opasa->query("select rule_id from order_assign_rule where username = '$reorder_repo' and site_id = $site_id and rule_type = '$this->rule_type'");
+			   //if username 
+			   if($present_status_sql->num_rows() >  0)	
+			   {												  
+				   return $reorder_repo; //parent order assigned username
+			   }	 
+			}
 		}
 		
 		//first we have to find which user is best for this order from order assign rule
@@ -107,6 +111,7 @@ class Order_model extends CI_Model {
 							and( 
                                 (a.max_order_amount > $order_price AND a.min_order_amount <= $order_price) 
                              OR (a.max_order_amount = '' AND a.min_order_amount <= $order_price)) 
+							 and a.rule_type = '$this->rule_type'
 							 order by a.username desc"; 						  
 	    $sql_best_user_frst =  $this->opasa->query($best_user_first);
 		//if no result assign to lead_repo user
@@ -145,7 +150,7 @@ class Order_model extends CI_Model {
 	{
 	       //check more than one lead repo
 		   //if yes slect best usernam efrom that
-		     $best_lead_repo      = "select a.username from order_assign_rule a where a.lead_repo = 1 and a.site_id = $site_id";
+		     $best_lead_repo      = "select a.username from order_assign_rule a where a.lead_repo = 1 and a.site_id = $site_id and a.rule_type = '$this->rule_type'";
 			 $sql_best_lead_repo  = $this->opasa->query($best_lead_repo);
 			 if($sql_best_lead_repo->num_rows() == 1) //if only one user match the rule
 		     {
@@ -247,7 +252,9 @@ class Order_model extends CI_Model {
 			  $sql = "SELECT a.username,a.site_id,a.`per_month`,a.`rule_priority`,b.present from order_assign_rule a 
                       join attendance b on a.username = b.username 
                       where b.work_date = CURDATE() and a.site_id = $site_id 
-					  and a.rule_priority = (select rule_priority from order_assign_rule where  rule_priority > $priority and site_id = $site_id order by rule_priority limit 1)";		  
+					  and a.rule_priority = (select rule_priority from order_assign_rule where  rule_priority > $priority and site_id = $site_id and rule_type = '$this->rule_type' order by rule_priority limit 1)
+					  and a.rule_type = '$this->rule_type'
+					  ";		  
 					
 			 $sql  = $this->opasa->query($sql);	  
 			 goto loop; 		  
@@ -286,7 +293,7 @@ class Order_model extends CI_Model {
 	}
 	
 	//assign order 
-	public function orderAssign($site_id,$order_id,$site_code,$username)
+	public function orderAssign($site_id, $order_id, $site_code, $username, $order_status)
 	{    
 	     $CI = &get_instance();
 		 $this->site_db = $CI->load->database($site_code, TRUE);
@@ -304,8 +311,8 @@ class Order_model extends CI_Model {
 			 if($this->site_db->query($query_order_update))
 			 {
 			   //insert order assign details to master database  
-			    $sql    = "INSERT INTO `assign_orders` (`id`, `username`, `site_id`, `order_id`, `assign_date`) 
-				           VALUES (NULL, '$username', '$site_id', '$order_id', NOW())";
+			    $sql    = "INSERT INTO `assign_orders` (`id`, `username`, `site_id`, `order_id`, `assign_date`, `assigned_status`, `current_status`) 
+				           VALUES (NULL, '$username', '$site_id', '$order_id', NOW(), $order_status, $order_status)";
 			    $this->opasa->query($sql);			   
 			 }
 			
@@ -412,15 +419,31 @@ class Order_model extends CI_Model {
 		return $this->opasa->query($sql);
 	}
 	//get all available rules
-	public function getRuleList()
+	public function getRuleList($type=1)
 	{
-	    $sql = "select a.*,b.site_code,b.site_name,c.name,count(d.id) as month_cnt 
-		        from order_assign_rule a join sites b on a.site_id = b.site_id 
-			    join users c on a.username = c.username 
-				left join assign_orders d on a.username = d.username and a.site_id = d.site_id 
-				and MONTH(d.assign_date) = MONTH(CURDATE()) and YEAR(d.assign_date) = YEAR(CURDATE())
-				group by b.site_code,b.site_name,c.name 
-				order by b.site_code,a.rule_priority,a.lead_repo";
+	    if($type == 1 || $type == 2)
+		{
+			$sql = "select a.*,b.site_code,b.site_name,c.name,count(d.id) as month_cnt 
+					from order_assign_rule a join sites b on a.site_id = b.site_id 
+					join users c on a.username = c.username 
+					left join assign_orders d on a.username = d.username and a.site_id = d.site_id 
+					and MONTH(d.assign_date) = MONTH(CURDATE()) and YEAR(d.assign_date) = YEAR(CURDATE()) 
+					where a.rule_type = '$type'
+					group by b.site_code,b.site_name,c.name 
+					order by b.site_code,a.rule_priority,a.lead_repo";
+		}
+		//free sample rule
+		else if($type == 3)
+		{
+		    $sql = "select a.*,b.site_code,b.site_name,c.name,count(d.id) as month_cnt 
+					from order_assign_rule a join sites b on a.site_id = b.site_id 
+					join users c on a.username = c.username 
+					left join sample_assign_orders d on a.username = d.username and a.site_id = d.site_id 
+					and MONTH(d.assign_date) = MONTH(CURDATE()) and YEAR(d.assign_date) = YEAR(CURDATE()) 
+					where a.rule_type = '$type'
+					group by b.site_code,b.site_name,c.name 
+					order by b.site_code,a.rule_priority,a.lead_repo";
+		}
 		return $this->opasa->query($sql);		
 	}
 	
@@ -435,10 +458,11 @@ class Order_model extends CI_Model {
 	     $per_month   = $_REQUEST['per_month'];
 	     $level       = $_REQUEST['level'];
 	     $lead_repo   = $_REQUEST['lead_repo'];
+		 $rule_type   = $_REQUEST['rule_type'];
 		 $admin_id    = $this->session->userdata('user_id');
 		 
 		 $sql = "INSERT INTO `order_assign_rule` 
-		         (`rule_id`, `username`, `site_id`, `per_month`, `min_order_amount`, `max_order_amount`, `rule_priority`, `lead_repo`,created_date,updated_date,updated_by)                 VALUES (NULL, '$username', '$site_id', '$per_month', '$value_from', '$value_to', '$level', '$lead_repo',NOW(),NOW(),'$admin_id')";
+		  (`rule_id`, `username`, `site_id`, `per_month`, `min_order_amount`, `max_order_amount`, `rule_priority`, `lead_repo`,created_date,updated_date,updated_by,rule_type)                 VALUES (NULL, '$username', '$site_id', '$per_month', '$value_from', '$value_to', '$level', '$lead_repo',NOW(),NOW(),'$admin_id','$rule_type')";
 		 if($this->opasa->query($sql))
 		 {
 		    return $this->opasa->insert_id();
@@ -501,7 +525,7 @@ class Order_model extends CI_Model {
 		//get order_ids
 		//avoid old orders
 		//select order only from one week time frame
-		$query_assigned_site = "select a.order_id,b.username from `order` a join user b on a.customer_assign = b.user_id 
+		$query_assigned_site = "select a.order_id, b.username from `order` a join user b on a.customer_assign = b.user_id 
 		                        where (a.date_added > DATE_SUB(NOW(), INTERVAL 5 DAY) or a.date_modified > DATE_SUB(NOW(), INTERVAL 5 Day)) and a.order_status_id not in(".EXCEPT_STATUS.")";
 		$sql_assigned_site   = $this->site_db->query($query_assigned_site); 
 		//add this result to array for comparison
@@ -545,14 +569,14 @@ class Order_model extends CI_Model {
 	    $CI = &get_instance();
 		$this->site_db = $CI->load->database($site_code, TRUE);
 		
-		$sql_assignedOrders = $this->site_db->query("SELECT a.order_id, a.date_added, b.username FROM `order` a JOIN user b ON a.customer_assign = b.user_id WHERE a.customer_assign <>0 AND (a.date_added > DATE_SUB( NOW( ) , INTERVAL 4 DAY )) and a.order_status_id not in(".EXCEPT_STATUS.")");
+		$sql_assignedOrders = $this->site_db->query("SELECT a.order_id, a.date_added, b.username, a.order_status_id FROM `order` a JOIN user b ON a.customer_assign = b.user_id WHERE a.customer_assign <>0 AND (a.date_added > DATE_SUB( NOW() , INTERVAL 4 DAY ) or a.date_modified > DATE_SUB( NOW() , INTERVAL 4 DAY )) and a.order_status_id not in(".EXCEPT_STATUS.")");
 		return $sql_assignedOrders;
 	}
 	
 	//sync wesite orders to opas table
 	//if order is already in table no action
 	//else insert into assign order table<br />
-    public function syncOrder($site_id,$order_id,$username,$dateadded)
+    public function syncOrder($site_id,$order_id,$username,$dateadded,$order_status)
 	{
 	    //check this order is present in opas table
 		//else insert
@@ -561,9 +585,15 @@ class Order_model extends CI_Model {
 		{
 		  //insert
 		  //insert order assign details to master database  
-		   $sql    = "INSERT INTO `assign_orders` (`id`, `username`, `site_id`, `order_id`, `assign_date`) 
-				           VALUES (NULL, '$username', '$site_id', '$order_id', '$dateadded')";
+		   $sql    = "INSERT INTO `assign_orders` (`id`, `username`, `site_id`, `order_id`, `assign_date`,`assigned_status`, `current_status`) 
+				           VALUES (NULL, '$username', '$site_id', '$order_id', '$dateadded', '$order_status', '$order_status')";
 		   $this->opasa->query($sql);	
+		}
+		//update order status 
+		else
+		{
+		    $sql    = "update `assign_orders` set `current_status` ='$order_status' where order_id = '$order_id' and site_id = '$site_id'";
+		   $this->opasa->query($sql);
 		}
 	}
 	
@@ -588,12 +618,63 @@ class Order_model extends CI_Model {
 	}
 	
 	//get count of rule of site using ruleid
+	//also check rule type
 	public function countRulesBySite($rule_id)
 	{
-	   $query = "SELECT count(*) as cnt FROM `order_assign_rule` WHERE `site_id` = (select `site_id` from order_assign_rule where `rule_id` ='$rule_id')";
+	   $query = "SELECT count(*) as cnt FROM `order_assign_rule` WHERE 
+	            `site_id` = (select `site_id` from order_assign_rule where `rule_id` ='$rule_id') 
+				  and rule_type = (select `rule_type` from order_assign_rule where `rule_id` ='$rule_id')";
 	   $sql   = $this->opasa->query($query);
 	   $row   = $sql->row();
 	   return $row->cnt;
 	}
 	
+	public function get_filter_rules()
+	{
+	    $ruletype = $_REQUEST['rule_type'];
+	    $username   = $_REQUEST['user_id'];
+	    $site_id   = $_REQUEST['site_id'];
+		$sql_where = '';
+		if($username!= '0')
+		{
+		   $sql_where .=" and a.username = '$username'";
+		}
+		if($site_id!=0)
+		{
+		   $sql_where .=" and a.site_id = '$site_id'";
+		}
+	    $sql = "select a.*,b.site_code,b.site_name,c.name,count(d.id) as month_cnt 
+		        from order_assign_rule a join sites b on a.site_id = b.site_id 
+			    join users c on a.username = c.username 
+				left join assign_orders d on a.username = d.username and a.site_id = d.site_id 
+				and MONTH(d.assign_date) = MONTH(CURDATE()) and YEAR(d.assign_date) = YEAR(CURDATE()) 
+				where a.rule_type = '$ruletype'".$sql_where."
+				group by b.site_code,b.site_name,c.name 
+				order by b.site_code,a.rule_priority,a.lead_repo";
+		return $this->opasa->query($sql);	
+	}	
+	
+	//get today assigned processing orders by site_id
+	public function get_daily_processing_order($site_id)
+	{
+	   $sql  = "SELECT `order_id`,`site_id` FROM `assign_orders` WHERE `assigned_status`=2 and date(`assign_date`)= curdate()";
+	   return $this->opasa->query($sql);
+	}
+	
+	public function check_exist_in_site($site_code,$order_id,$site_id)
+	{
+	   //check processing order still exists in live site
+	   //else remove from assign_orders table
+	   $CI = &get_instance();
+	   $this->site_db = $CI->load->database($site_code, TRUE);
+	   $sql       = "SELECT `order_id` FROM `order` WHERE `order_id` = '$order_id'";
+	   $sql_exist = $this->site_db->query($sql);
+	   //if doesnt exist
+	   if($sql_exist->num_rows() < 1)
+	   {
+	      $sql = "delete from assign_orders where order_id ='$order_id' and site_id='$site_id'";
+		  $this->opasa->query($sql);
+	   }
+	   
+	}
 }

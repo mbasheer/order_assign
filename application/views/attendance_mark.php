@@ -25,9 +25,10 @@ $(".subf").click(function() {
 	var value_to = $("#value_to").val();
 	var per_month = $("#per_month").val();
 	var level   = $("#levels").val();
+	var rule_type = $("#rule_type").val();
 	var lead_repo = 0;
 	if($('#lead_repo').prop("checked") == true){lead_repo = 1;}
-    var dataString = 'username='+ username+'&site_id='+site_id+'&value_from='+value_from+'&value_to='+value_to+'&per_month='+per_month+'&level='+level+'&lead_repo='+lead_repo;
+    var dataString = 'username='+ username+'&site_id='+site_id+'&value_from='+value_from+'&value_to='+value_to+'&per_month='+per_month+'&level='+level+'&lead_repo='+lead_repo+'&rule_type='+rule_type;
 	if(username=='')
 	{
 	 alert("Please Select Employee");
@@ -78,15 +79,68 @@ return false;
 		   $('#run_rule').hide();
 			},
         success: function(){
-		                    $('#running').hide(); 
-							$('#run_rule').show();
+		                   //free sample assign
+							$.ajax({
+							url: "<?php echo base_url()?>index.php/cron/freesample_assign",
+							cache: false,
+							success: function(){
+									$('#running').hide(); 
+								    $('#run_rule').show();
+										   }
+							   });
+							//end free sample
                        }
            });
 	  
 	})
 	
+	//filter rule
+	$("#filter_row").click(function() {
+	var rule_type  = $("#rule_type").val();
+	var filter_user = $("#filter_user").val();
+	var filter_product = $("#filter_product").val();
+	 var dataString = 'rule_type='+ rule_type+'&user_id='+filter_user+'&site_id='+filter_product;
+	   $.ajax({
+        url: "<?php echo base_url()?>index.php/order_rule/filter_rules",
+		data: dataString,
+        cache: false,
+        success: function(htm){
+		                    $('#update').html(htm); 
+                       }
+           });
+	  
+	})
+	
+	
  
 });
+
+function display_rules(type)
+{
+    
+        $('#filter_user').val("0");
+        $('#filter_product').val("0");
+		if(type==3)
+		{
+           $('#valuefrm_div').hide();
+		   $('#valueto_div').hide();
+		}
+		else
+		{
+		   $('#valuefrm_div').show();
+		   $('#valueto_div').show();
+		}
+		$.ajax({
+        url: "<?php echo base_url()?>index.php/order_rule/getRulesByType/"+type,
+        cache: false,
+		beforeSend: function() {
+					},
+        success: function(htm){
+		                    $('#update').html(htm); 
+                       }
+           });
+	  
+}
 
 </script>	
 	 <?php  $this->load->view('order_assign_js');?>
@@ -159,8 +213,11 @@ return false;
   <!---->
   <div id="tab-2" class="tab-content">
     <div class="main-header selw">
-      <div class="left-widthr"><b>Order Assign Rule</b></div>
+     <div class="left-widthr"><b>Order Assign Rule</b></div>
       <br clear="all">
+     <div class="leftform"> <label>Rule Type: </label> <select id="rule_type" onChange="display_rules(this.value)"><option value="1">General Assign Rule</option><option value="2">Processing Assign Rule</option><option value="3">Free Sample Assign Rule</option></select> </div>
+     <br clear="all">
+     
       <div class="leftform">
 	  <form name="rulfrm" id="myForm" action="#" method="post">
         <label>Employee: </label>
@@ -180,11 +237,11 @@ return false;
 		   <?php }?> 
         </select>
       </div>
-      <div class="leftform">
+      <div class="leftform" id="valuefrm_div">
         <label>Order value From: </label>
         <input id="value_from" type="number">
       </div>
-      <div class="leftform">
+      <div class="leftform" id="valueto_div">
         <label>To: </label>
         <input id="value_to" type="number">
       </div>
@@ -217,6 +274,16 @@ return false;
       </div>
     </form>
 	<div id="flash" align="left"  ></div>
+    <div class="filderdiv">
+    <select id="filter_user" style="width:150px;"><option value="0">All Employees</option>
+	      <?php foreach($employee->result() as $user){?>
+		   <option value="<?php echo $user->username;?>"><?php echo $user->name;?></option>
+		   <?php }?>   </select>
+           &nbsp;<select id="filter_product" style="width:120px;"><option value="0">All Products</option>
+           <?php foreach($sites->result() as $site){?>
+		   <option value="<?php echo $site->site_id;?>"><?php echo $site->site_code;?></option>
+		   <?php }?> 
+           </select>&nbsp;<div class="filter" ><a href="#" id="filter_row">Filter</a></div></div>
 	<div class="runrule" id="runrule"><a href="#" id="run_rule" title="Run Rule" alt="Run Rule">Run Rule Now</a></div><div class="runrule" id="running"></div>
      <div id="inform" align="left" style="color:#FF0000;"></div>
     <table width="100%" border="0" class="imagetable" id="update" >
