@@ -82,9 +82,6 @@ class Order_model extends CI_Model {
 		//if this order is a copy/reorder of another order , assigned to same user
 		//return previous order asisgne drepo name 
 		//else return 0
-		//reorder checking except processing orders
-		if($order_status != 2)
-		{
 			$reorder_repo     = $this->checkReOrder($order_id, $cust_email);
 			if($reorder_repo)
 			{
@@ -97,7 +94,6 @@ class Order_model extends CI_Model {
 				   return $reorder_repo; //parent order assigned username
 			   }	 
 			}
-		}
 		
 		//first we have to find which user is best for this order from order assign rule
 		//then check that user is not exceeds the threshold
