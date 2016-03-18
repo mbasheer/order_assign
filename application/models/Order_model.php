@@ -672,7 +672,7 @@ class Order_model extends CI_Model {
 	      $sql = "delete from assign_orders where order_id ='$order_id' and site_id='$site_id'";
 		  $this->opasa->query($sql);
 		  
-		  $sql = "delete from order where order_id ='$order_id' and site_id='$site_id'";
+		  $sql = "delete from `order` where order_id ='$order_id' and site_id='$site_id'";
 		  $this->opasa->query($sql);
 	   }
 	   
