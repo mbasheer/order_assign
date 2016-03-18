@@ -666,9 +666,13 @@ class Order_model extends CI_Model {
 	   $sql       = "SELECT `order_id` FROM `order` WHERE `order_id` = '$order_id'";
 	   $sql_exist = $this->site_db->query($sql);
 	   //if doesnt exist
+	   //dlete order from asisgned table and directpr order tables
 	   if($sql_exist->num_rows() < 1)
 	   {
 	      $sql = "delete from assign_orders where order_id ='$order_id' and site_id='$site_id'";
+		  $this->opasa->query($sql);
+		  
+		  $sql = "delete from order where order_id ='$order_id' and site_id='$site_id'";
 		  $this->opasa->query($sql);
 	   }
 	   
