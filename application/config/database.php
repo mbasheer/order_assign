@@ -87,8 +87,8 @@ $db['hr'] = array(
 $db['CMD'] = array(
 	'dsn'	=> '',
 	'hostname' => '50.28.9.200',
-	'username' => 'custom',
-	'password' => '#^Q=3L2*+MHS',
+	'username' => 'custom_usmagnets',
+	'password' => 'A(p)~N,cU}a6',
 	'database' => 'custom_usmagnets',
 	'dbdriver' => 'mysqli',
 	'dbprefix' => '',
@@ -106,6 +106,7 @@ $db['CMD'] = array(
 	'failover' => array(),
 	'save_queries' => TRUE
 );
+
 
 	$db['SGV'] = array(
 	'dsn'	=> '',
