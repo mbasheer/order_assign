@@ -62,12 +62,16 @@ class Order_model extends CI_Model {
 		//if order is blank that order directly assigned to blank user with our any further checking
 		//call checkorderisblank function for checking this orsder is balnk or not
 		//return 1 is blank otherwise return 0
-		$is_blank = $this->checkOrderIsBlank($site_code,$order_id);
-		if($is_blank)
+		//if processing order blank check will skip
+		if($order_status != 2)
 		{
-		   
-		   return 'blank';
-		}
+			$is_blank = $this->checkOrderIsBlank($site_code,$order_id);
+			if($is_blank)
+			{
+			   
+			   return 'blank';
+			}
+		}	
 		
 		//check this order created by our staff other than customer assign to that staff 
 		/*if($createduser != 0)
@@ -349,7 +353,7 @@ class Order_model extends CI_Model {
 	   if(in_array($site_code,$blank_arr))
 	   {
 	      //check if any product have imprinte 
-		  $query_product  = "select product_id from order_product where order_id = '$order_id' and label <> 'Blank'";
+		  $query_product  = "select product_id from order_product where order_id = '$order_id' and label <> 'Blank' and label <> 'Not Imprinted'";
 	   }
 	   else
 	   {
@@ -469,11 +473,25 @@ class Order_model extends CI_Model {
 	//get rule details by rule id\
 	public function getRulebyId($rule_id)
 	{
-	     $sql  = "select a.*,b.site_code,b.site_name,c.name,count(d.id) as month_cnt 
+	     //get rule type by rule_id
+		 $rule_type = $this->opasa->query("select rule_type from order_assign_rule where rule_id='$rule_id'");
+		 $rule_type = $rule_type->row()->rule_type;
+		 if($rule_type == 1 || $rule_type == 2)
+		 {
+		   $sql  = "select a.*,b.site_code,b.site_name,c.name,count(d.id) as month_cnt 
 		          from order_assign_rule a 
 		          join sites b on a.site_id = b.site_id join users c on a.username = c.username
 				  left join assign_orders d on a.username = d.username and a.site_id = d.site_id and MONTH(d.assign_date) = MONTH(CURDATE()) and YEAR(d.assign_date) = YEAR(CURDATE()) 
-				  WHERE `rule_id`=$rule_id ";
+				  WHERE a.`rule_id`=$rule_id";
+		 }
+		 else if ($rule_type == 3)	
+		 {
+		    $sql  = "select a.*,b.site_code,b.site_name,c.name,count(d.id) as month_cnt 
+		          from order_assign_rule a 
+		          join sites b on a.site_id = b.site_id join users c on a.username = c.username
+				  left join sample_assign_orders d on a.username = d.username and a.site_id = d.site_id and MONTH(d.assign_date) = MONTH(CURDATE()) and YEAR(d.assign_date) = YEAR(CURDATE()) 
+				  WHERE a.`rule_id`=$rule_id"; 
+		 }	  
 		 return $this->opasa->query($sql);
 	}
 	
