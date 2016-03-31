@@ -93,9 +93,10 @@ class Order_rule extends CI_Controller {
 	}
 	
 	//filter rules
-	public function filter_rules()
+	public function filter_rules($rule_type=1)
 	{
-	    $data['rules'] = $this->order->get_filter_rules();
+	    $data['rule_type'] = $rule_type;
+		$data['rules'] = $this->order->get_filter_rules();
 		$this->load->view('rules_list_view',$data);
 	}
 }	

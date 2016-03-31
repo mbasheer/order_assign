@@ -37,7 +37,7 @@ class Attendance_model extends CI_Model {
 	//mark attendance with full presnet in today date
 	public function markDefaultAttendance()
 	{
-	    $sql_all = $this->opasa->query("select username from users where username <> 'blank' order by name");
+	    $sql_all = $this->opasa->query("select username from users where username <> 'blank' and status =1 order by name");
 		$values ='';
 		foreach($sql_all->result() as $row)
 		{

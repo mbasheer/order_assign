@@ -101,7 +101,7 @@ return false;
 	var filter_product = $("#filter_product").val();
 	 var dataString = 'rule_type='+ rule_type+'&user_id='+filter_user+'&site_id='+filter_product;
 	   $.ajax({
-        url: "<?php echo base_url()?>index.php/order_rule/filter_rules",
+        url: "<?php echo base_url()?>index.php/order_rule/filter_rules/"+rule_type,
 		data: dataString,
         cache: false,
         success: function(htm){

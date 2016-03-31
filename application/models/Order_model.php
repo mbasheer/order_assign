@@ -409,7 +409,7 @@ class Order_model extends CI_Model {
 	//function get all users
 	public function getUsersList()
 	{
-	    $sql = "SELECT * FROM `users` where username <> 'blank' ORDER BY `name`";
+	    $sql = "SELECT * FROM `users` where username <> 'blank' and status =1 ORDER BY `name`";
 		return $this->opasa->query($sql);
 	}
 	//function get all sites
